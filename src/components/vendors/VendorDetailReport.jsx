@@ -117,25 +117,178 @@ export default function VendorDetailReport({ vendor, open, onOpenChange }) {
               )}
             </div>
 
+            {/* Account Access Information */}
+            <div>
+              <h3 className="font-bold text-lg mb-3 pb-2 border-b">Account Access & Login</h3>
+              <div className="grid grid-cols-2 gap-4 mb-3">
+                <div className="text-sm">
+                  <p className="text-gray-600">Account ID</p>
+                  <p className="font-semibold">{vendor.account_id || 'N/A'}</p>
+                </div>
+                <div className="text-sm">
+                  <p className="text-gray-600">Login Username</p>
+                  <p className="font-semibold">{vendor.login_username || 'N/A'}</p>
+                </div>
+              </div>
+              {vendor.service_url && (
+                <div className="text-sm mb-3">
+                  <p className="text-gray-600 mb-1">Service URL</p>
+                  <a href={vendor.service_url} target="_blank" rel="noopener noreferrer" className="text-blue-600 underline font-semibold">{vendor.service_url}</a>
+                </div>
+              )}
+              {vendor.api_endpoint && (
+                <div className="text-sm mb-3">
+                  <p className="text-gray-600 mb-1">API Endpoint</p>
+                  <p className="font-semibold text-xs bg-gray-50 p-2 rounded">{vendor.api_endpoint}</p>
+                </div>
+              )}
+              {vendor.license_key && (
+                <div className="text-sm mb-3">
+                  <p className="text-gray-600">License Key</p>
+                  <p className="font-semibold text-xs bg-gray-50 p-2 rounded">{vendor.license_key}</p>
+                </div>
+              )}
+              {vendor.note_password_stored_separately && (
+                <div className="text-sm">
+                  <p className="text-gray-600 mb-1">Access Notes</p>
+                  <p className="text-sm text-gray-700 bg-gray-50 p-3 rounded">{vendor.note_password_stored_separately}</p>
+                </div>
+              )}
+            </div>
+
+            {/* Pricing & Billing */}
+            <div>
+              <h3 className="font-bold text-lg mb-3 pb-2 border-b">Pricing & Billing</h3>
+              <div className="grid grid-cols-2 gap-4 mb-3">
+                <div className="text-sm">
+                  <p className="text-gray-600">Pricing Model</p>
+                  <p className="font-semibold">{vendor.pricing_model?.replace(/_/g, ' ') || 'N/A'}</p>
+                </div>
+                <div className="text-sm">
+                  <p className="text-gray-600">Payment Method</p>
+                  <p className="font-semibold">{vendor.payment_method?.replace(/_/g, ' ') || 'N/A'}</p>
+                </div>
+              </div>
+              <div className="grid grid-cols-3 gap-3 mb-3">
+                {vendor.monthly_cost > 0 && (
+                  <div className="border rounded p-2 text-sm">
+                    <p className="text-gray-600 text-xs">Monthly Cost</p>
+                    <p className="font-bold text-lg">{vendor.currency} {vendor.monthly_cost.toFixed(2)}</p>
+                  </div>
+                )}
+                {vendor.annual_cost > 0 && (
+                  <div className="border rounded p-2 text-sm">
+                    <p className="text-gray-600 text-xs">Annual Cost</p>
+                    <p className="font-bold text-lg">{vendor.currency} {vendor.annual_cost.toFixed(2)}</p>
+                  </div>
+                )}
+                {vendor.cost_per_user > 0 && (
+                  <div className="border rounded p-2 text-sm">
+                    <p className="text-gray-600 text-xs">Cost per User</p>
+                    <p className="font-bold text-lg">{vendor.currency} {vendor.cost_per_user.toFixed(2)}</p>
+                  </div>
+                )}
+              </div>
+              {vendor.number_of_users > 0 && (
+                <div className="text-sm mb-3">
+                  <p className="text-gray-600">Licensed Users</p>
+                  <p className="font-semibold">{vendor.number_of_users} users</p>
+                </div>
+              )}
+              {vendor.billing_email && (
+                <div className="text-sm">
+                  <p className="text-gray-600">Billing Email</p>
+                  <p className="font-semibold">{vendor.billing_email}</p>
+                </div>
+              )}
+            </div>
+
             {/* Contractual Information */}
             <div>
               <h3 className="font-bold text-lg mb-3 pb-2 border-b">Contract & SLA</h3>
-              <div className="grid grid-cols-2 gap-4 mb-3">
+              <div className="grid grid-cols-2 gap-3 mb-3">
                 <div className="text-sm">
+                  <p className="text-gray-600">Status</p>
+                  <p className="font-semibold">{vendor.contract_status?.replace(/_/g, ' ') || 'N/A'}</p>
+                </div>
+                <div className="text-sm">
+                  <p className="text-gray-600">Auto-Renewal</p>
+                  <p className="font-semibold">{vendor.auto_renewal ? 'Yes' : 'No'}</p>
+                </div>
+              </div>
+              <div className="grid grid-cols-3 gap-3 mb-3 text-sm">
+                <div>
                   <p className="text-gray-600">Start Date</p>
                   <p className="font-semibold">{vendor.contract_start_date || 'N/A'}</p>
                 </div>
-                <div className="text-sm">
+                <div>
                   <p className="text-gray-600">End Date</p>
                   <p className="font-semibold">{vendor.contract_end_date || 'N/A'}</p>
                 </div>
+                <div>
+                  <p className="text-gray-600">Renewal Reminder</p>
+                  <p className="font-semibold">{vendor.renewal_reminder_date || 'N/A'}</p>
+                </div>
               </div>
+              {(vendor.uptime_sla || vendor.support_hours || vendor.response_time_sla) && (
+                <div className="grid grid-cols-3 gap-3 mb-3 text-sm">
+                  {vendor.uptime_sla && (
+                    <div>
+                      <p className="text-gray-600">Uptime SLA</p>
+                      <p className="font-semibold">{vendor.uptime_sla}%</p>
+                    </div>
+                  )}
+                  {vendor.support_hours && (
+                    <div>
+                      <p className="text-gray-600">Support Hours</p>
+                      <p className="font-semibold text-xs">{vendor.support_hours}</p>
+                    </div>
+                  )}
+                  {vendor.response_time_sla && (
+                    <div>
+                      <p className="text-gray-600">Response Time</p>
+                      <p className="font-semibold text-xs">{vendor.response_time_sla}</p>
+                    </div>
+                  )}
+                </div>
+              )}
               {vendor.sla_coverage && (
                 <div className="text-sm">
                   <p className="text-gray-600 mb-1">SLA Coverage & Terms</p>
                   <p className="text-sm text-gray-700 bg-gray-50 p-3 rounded">{vendor.sla_coverage}</p>
                 </div>
               )}
+            </div>
+
+            {/* Contact Information - Extended */}
+            <div>
+              <h3 className="font-bold text-lg mb-3 pb-2 border-b">Extended Contact Information</h3>
+              <div className="grid grid-cols-2 gap-3 text-sm">
+                {vendor.support_email && (
+                  <div>
+                    <p className="text-gray-600">Support Email</p>
+                    <p className="font-semibold">{vendor.support_email}</p>
+                  </div>
+                )}
+                {vendor.support_phone && (
+                  <div>
+                    <p className="text-gray-600">Support Phone</p>
+                    <p className="font-semibold">{vendor.support_phone}</p>
+                  </div>
+                )}
+                {vendor.backup_contact && (
+                  <div>
+                    <p className="text-gray-600">Backup Contact</p>
+                    <p className="font-semibold">{vendor.backup_contact}</p>
+                  </div>
+                )}
+                {vendor.backup_contact_email && (
+                  <div>
+                    <p className="text-gray-600">Backup Email</p>
+                    <p className="font-semibold">{vendor.backup_contact_email}</p>
+                  </div>
+                )}
+              </div>
             </div>
 
             {/* Audit Information */}

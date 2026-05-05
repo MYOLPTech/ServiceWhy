@@ -20,9 +20,13 @@ function generateNextId(records) {
 const DEFAULT = {
   vendor_id: '', name: '', description: '', category: 'software', status: 'active',
   criticality: 'medium', risk_level: 'medium', risk_score: 50, risk_assessment: '', mitigation_strategy: '',
-  primary_contact: '', contact_email: '', contact_phone: '', website: '',
+  primary_contact: '', contact_email: '', contact_phone: '', backup_contact: '', backup_contact_email: '', backup_contact_phone: '',
+  support_email: '', support_phone: '', website: '', service_url: '',
+  pricing_model: 'monthly_subscription', monthly_cost: 0, annual_cost: 0, currency: 'USD', number_of_users: 0, cost_per_user: 0,
+  payment_method: 'invoice', billing_email: '', account_id: '', login_username: '', note_password_stored_separately: '', license_key: '', api_endpoint: '',
   data_access_level: 'public_only', contract_status: 'draft', contract_start_date: '', contract_end_date: '',
-  sla_coverage: '', due_diligence_status: 'pending', due_diligence_date: '', last_audit_date: '', next_audit_date: '',
+  auto_renewal: true, renewal_reminder_date: '', sla_coverage: '', uptime_sla: '', support_hours: '', response_time_sla: '',
+  due_diligence_status: 'pending', due_diligence_date: '', last_audit_date: '', next_audit_date: '',
   certifications: [], applicable_frameworks: [], compliance_status: 'under_review', owner: '', notes: '',
   linked_control_ids: [], linked_risk_ids: [], linked_task_ids: []
 };
@@ -79,9 +83,11 @@ export default function VendorFormDialog({ open, onOpenChange, vendor, onSave, s
           <div className="flex-shrink-0">
             <TabsList className="mb-4 flex-shrink-0">
               <TabsTrigger value="details">Vendor Details</TabsTrigger>
+              <TabsTrigger value="accounts">Accounts & Access</TabsTrigger>
+              <TabsTrigger value="pricing">Pricing & Billing</TabsTrigger>
+              <TabsTrigger value="contracts">Contract & SLA</TabsTrigger>
               <TabsTrigger value="risk">Risk & Compliance</TabsTrigger>
               <TabsTrigger value="certifications">Certifications</TabsTrigger>
-              <TabsTrigger value="contracts">Contract & SLA</TabsTrigger>
             </TabsList>
           </div>
           <div className="flex-1 overflow-y-auto pr-2">
@@ -160,6 +166,39 @@ export default function VendorFormDialog({ open, onOpenChange, vendor, onSave, s
                 </div>
               </div>
 
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-1.5">
+                  <Label>Backup Contact</Label>
+                  <Input placeholder="Name" value={form.backup_contact} onChange={e => set('backup_contact', e.target.value)} />
+                </div>
+                <div className="space-y-1.5">
+                  <Label>Backup Email</Label>
+                  <Input type="email" placeholder="backup@vendor.com" value={form.backup_contact_email} onChange={e => set('backup_contact_email', e.target.value)} />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-1.5">
+                  <Label>Backup Phone</Label>
+                  <Input placeholder="+1 (555) 987-6543" value={form.backup_contact_phone} onChange={e => set('backup_contact_phone', e.target.value)} />
+                </div>
+                <div className="space-y-1.5">
+                  <Label>Service URL</Label>
+                  <Input placeholder="https://app.vendor.com" value={form.service_url} onChange={e => set('service_url', e.target.value)} />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-1.5">
+                  <Label>Support Email</Label>
+                  <Input type="email" placeholder="support@vendor.com" value={form.support_email} onChange={e => set('support_email', e.target.value)} />
+                </div>
+                <div className="space-y-1.5">
+                  <Label>Support Phone</Label>
+                  <Input placeholder="+1 (555) 555-5555" value={form.support_phone} onChange={e => set('support_phone', e.target.value)} />
+                </div>
+              </div>
+
               <div className="space-y-1.5">
                 <Label>Owner</Label>
                 <Input placeholder="Responsible person" value={form.owner} onChange={e => set('owner', e.target.value)} />
@@ -169,7 +208,108 @@ export default function VendorFormDialog({ open, onOpenChange, vendor, onSave, s
                 <Label>Notes</Label>
                 <Textarea rows={2} placeholder="Additional notes..." value={form.notes} onChange={e => set('notes', e.target.value)} />
               </div>
-            </TabsContent>
+              </TabsContent>
+
+              <TabsContent value="accounts" className="space-y-4">
+              <div className="space-y-1.5">
+                <Label>Account ID / Number</Label>
+                <Input placeholder="e.g. ACC-12345" value={form.account_id} onChange={e => set('account_id', e.target.value)} />
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-1.5">
+                  <Label>Login Username</Label>
+                  <Input placeholder="Username for access" value={form.login_username} onChange={e => set('login_username', e.target.value)} />
+                </div>
+                <div className="space-y-1.5">
+                  <Label>Service Login URL</Label>
+                  <Input placeholder="https://login.vendor.com" value={form.service_url} onChange={e => set('service_url', e.target.value)} />
+                </div>
+              </div>
+
+              <div className="bg-blue-50 p-3 rounded border border-blue-200 text-xs text-blue-800 mb-3">
+                <strong>Security Note:</strong> Store passwords in your secure password manager, not here. Document account access information securely.
+              </div>
+
+              <div className="space-y-1.5">
+                <Label>License Key / Product Key</Label>
+                <Input placeholder="License activation key" value={form.license_key} onChange={e => set('license_key', e.target.value)} />
+              </div>
+
+              <div className="space-y-1.5">
+                <Label>API Endpoint</Label>
+                <Input placeholder="https://api.vendor.com/v1" value={form.api_endpoint} onChange={e => set('api_endpoint', e.target.value)} />
+              </div>
+
+              <div className="space-y-1.5">
+                <Label>Notes for Account Access</Label>
+                <Textarea rows={3} placeholder="Document how to access this vendor's services, special login procedures, etc." value={form.note_password_stored_separately} onChange={e => set('note_password_stored_separately', e.target.value)} />
+              </div>
+              </TabsContent>
+
+              <TabsContent value="pricing" className="space-y-4">
+              <div className="grid grid-cols-3 gap-4">
+                <div className="space-y-1.5">
+                  <Label>Pricing Model</Label>
+                  <Select value={form.pricing_model} onValueChange={v => set('pricing_model', v)}>
+                    <SelectTrigger><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      {['monthly_subscription','annual_subscription','per_user','usage_based','one_time','hybrid','other'].map(m => (
+                        <SelectItem key={m} value={m}>{m.replace(/_/g, ' ')}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-1.5">
+                  <Label>Currency</Label>
+                  <Select value={form.currency} onValueChange={v => set('currency', v)}>
+                    <SelectTrigger><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      {['USD','EUR','GBP','AUD','CAD','NZD','SGD','JPY','other'].map(c => (
+                        <SelectItem key={c} value={c}>{c}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-1.5">
+                  <Label>Payment Method</Label>
+                  <Select value={form.payment_method} onValueChange={v => set('payment_method', v)}>
+                    <SelectTrigger><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      {['credit_card','bank_transfer','invoice','other'].map(m => (
+                        <SelectItem key={m} value={m}>{m.replace(/_/g, ' ')}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-1.5">
+                  <Label>Monthly Cost ({form.currency})</Label>
+                  <Input type="number" min="0" step="0.01" placeholder="0.00" value={form.monthly_cost} onChange={e => set('monthly_cost', parseFloat(e.target.value) || 0)} />
+                </div>
+                <div className="space-y-1.5">
+                  <Label>Annual Cost ({form.currency})</Label>
+                  <Input type="number" min="0" step="0.01" placeholder="0.00" value={form.annual_cost} onChange={e => set('annual_cost', parseFloat(e.target.value) || 0)} />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-3 gap-4">
+                <div className="space-y-1.5">
+                  <Label>Number of Users / Licenses</Label>
+                  <Input type="number" min="0" placeholder="0" value={form.number_of_users} onChange={e => set('number_of_users', parseInt(e.target.value) || 0)} />
+                </div>
+                <div className="space-y-1.5">
+                  <Label>Cost per User ({form.currency})</Label>
+                  <Input type="number" min="0" step="0.01" placeholder="0.00" value={form.cost_per_user} onChange={e => set('cost_per_user', parseFloat(e.target.value) || 0)} />
+                </div>
+                <div className="space-y-1.5">
+                  <Label>Billing Email</Label>
+                  <Input type="email" placeholder="billing@vendor.com" value={form.billing_email} onChange={e => set('billing_email', e.target.value)} />
+                </div>
+              </div>
+              </TabsContent>
 
             <TabsContent value="risk" className="space-y-4">
               <div className="grid grid-cols-3 gap-4">
@@ -315,7 +455,13 @@ export default function VendorFormDialog({ open, onOpenChange, vendor, onSave, s
                     </SelectContent>
                   </Select>
                 </div>
-                <div />
+                <div className="space-y-1.5">
+                  <Label>Auto-Renewal</Label>
+                  <div className="flex items-center mt-2">
+                    <input type="checkbox" checked={form.auto_renewal} onChange={e => set('auto_renewal', e.target.checked)} className="rounded border-gray-300" />
+                    <span className="ml-2 text-sm">Contract auto-renews</span>
+                  </div>
+                </div>
               </div>
 
               <div className="grid grid-cols-2 gap-4">
@@ -330,8 +476,29 @@ export default function VendorFormDialog({ open, onOpenChange, vendor, onSave, s
               </div>
 
               <div className="space-y-1.5">
+                <Label>Renewal Reminder Date</Label>
+                <Input type="date" placeholder="When to remind about renewal" value={form.renewal_reminder_date} onChange={e => set('renewal_reminder_date', e.target.value)} />
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-1.5">
+                  <Label>Uptime SLA (%)</Label>
+                  <Input placeholder="e.g. 99.9" value={form.uptime_sla} onChange={e => set('uptime_sla', e.target.value)} />
+                </div>
+                <div className="space-y-1.5">
+                  <Label>Support Hours</Label>
+                  <Input placeholder="e.g. 24/7 or 9am-5pm EST" value={form.support_hours} onChange={e => set('support_hours', e.target.value)} />
+                </div>
+              </div>
+
+              <div className="space-y-1.5">
+                <Label>Response Time SLA</Label>
+                <Input placeholder="e.g. 4 hours, 24 hours" value={form.response_time_sla} onChange={e => set('response_time_sla', e.target.value)} />
+              </div>
+
+              <div className="space-y-1.5">
                 <Label>SLA Coverage & Terms</Label>
-                <Textarea rows={3} placeholder="Define SLA uptime guarantees, response times, etc..." value={form.sla_coverage} onChange={e => set('sla_coverage', e.target.value)} />
+                <Textarea rows={3} placeholder="Full details of SLA terms, exclusions, penalties..." value={form.sla_coverage} onChange={e => set('sla_coverage', e.target.value)} />
               </div>
 
               <div className="grid grid-cols-2 gap-4">

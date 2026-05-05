@@ -28,7 +28,8 @@
         "telecommunications",
         "other"
       ],
-      "default": "software"
+      "default": "software",
+      "description": "Type of vendor"
     },
     "status": {
       "type": "string",
@@ -52,6 +53,173 @@
       "default": "medium",
       "description": "Criticality level for business operations"
     },
+    "primary_contact": {
+      "type": "string",
+      "description": "Primary contact person"
+    },
+    "contact_email": {
+      "type": "string",
+      "description": "Contact email address"
+    },
+    "contact_phone": {
+      "type": "string"
+    },
+    "backup_contact": {
+      "type": "string",
+      "description": "Backup contact name"
+    },
+    "backup_contact_email": {
+      "type": "string",
+      "description": "Backup contact email"
+    },
+    "backup_contact_phone": {
+      "type": "string",
+      "description": "Backup contact phone"
+    },
+    "support_email": {
+      "type": "string",
+      "description": "Vendor support email"
+    },
+    "support_phone": {
+      "type": "string",
+      "description": "Vendor support phone"
+    },
+    "website": {
+      "type": "string"
+    },
+    "service_url": {
+      "type": "string",
+      "description": "Login/access URL for the service"
+    },
+    "owner": {
+      "type": "string",
+      "description": "Person responsible for vendor management"
+    },
+    "data_access_level": {
+      "type": "string",
+      "enum": [
+        "none",
+        "public_only",
+        "internal",
+        "confidential",
+        "restricted"
+      ],
+      "default": "public_only",
+      "description": "Level of data access provided to vendor"
+    },
+    "pricing_model": {
+      "type": "string",
+      "enum": [
+        "monthly_subscription",
+        "annual_subscription",
+        "per_user",
+        "usage_based",
+        "one_time",
+        "hybrid",
+        "other"
+      ],
+      "description": "How the vendor charges for services"
+    },
+    "monthly_cost": {
+      "type": "number",
+      "description": "Monthly subscription/service cost in USD"
+    },
+    "annual_cost": {
+      "type": "number",
+      "description": "Annual cost in USD (if different from monthly)"
+    },
+    "currency": {
+      "type": "string",
+      "default": "USD",
+      "description": "Currency for pricing"
+    },
+    "number_of_users": {
+      "type": "number",
+      "description": "Number of licensed users"
+    },
+    "cost_per_user": {
+      "type": "number",
+      "description": "Cost per user (if applicable)"
+    },
+    "payment_method": {
+      "type": "string",
+      "enum": [
+        "credit_card",
+        "bank_transfer",
+        "invoice",
+        "other"
+      ],
+      "description": "How payments are made"
+    },
+    "billing_email": {
+      "type": "string",
+      "description": "Email for billing/invoices"
+    },
+    "account_id": {
+      "type": "string",
+      "description": "Account number or ID with vendor"
+    },
+    "login_username": {
+      "type": "string",
+      "description": "Main account username"
+    },
+    "note_password_stored_separately": {
+      "type": "string",
+      "description": "Note: Passwords should be stored in secure password manager, not here"
+    },
+    "license_key": {
+      "type": "string",
+      "description": "License key or product key (if applicable)"
+    },
+    "api_endpoint": {
+      "type": "string",
+      "description": "API endpoint URL (if applicable)"
+    },
+    "contract_status": {
+      "type": "string",
+      "enum": [
+        "draft",
+        "signed",
+        "active",
+        "expired",
+        "terminated"
+      ],
+      "default": "draft"
+    },
+    "contract_start_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "contract_end_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "auto_renewal": {
+      "type": "boolean",
+      "default": true,
+      "description": "Whether contract auto-renews"
+    },
+    "renewal_reminder_date": {
+      "type": "string",
+      "format": "date",
+      "description": "Date to remind about renewal"
+    },
+    "sla_coverage": {
+      "type": "string",
+      "description": "SLA terms and uptime guarantee"
+    },
+    "uptime_sla": {
+      "type": "string",
+      "description": "SLA uptime percentage (e.g., 99.9%)"
+    },
+    "support_hours": {
+      "type": "string",
+      "description": "Hours of support availability"
+    },
+    "response_time_sla": {
+      "type": "string",
+      "description": "Expected response time for support"
+    },
     "risk_level": {
       "type": "string",
       "enum": [
@@ -73,55 +241,6 @@
     "mitigation_strategy": {
       "type": "string",
       "description": "Plan to mitigate identified risks"
-    },
-    "primary_contact": {
-      "type": "string",
-      "description": "Primary contact person"
-    },
-    "contact_email": {
-      "type": "string",
-      "description": "Contact email address"
-    },
-    "contact_phone": {
-      "type": "string"
-    },
-    "website": {
-      "type": "string"
-    },
-    "data_access_level": {
-      "type": "string",
-      "enum": [
-        "none",
-        "public_only",
-        "internal",
-        "confidential",
-        "restricted"
-      ],
-      "default": "public_only",
-      "description": "Level of data access provided to vendor"
-    },
-    "contract_status": {
-      "type": "string",
-      "enum": [
-        "draft",
-        "signed",
-        "active",
-        "expired",
-        "terminated"
-      ],
-      "default": "draft"
-    },
-    "contract_start_date": {
-      "type": "string",
-      "format": "date"
-    },
-    "contract_end_date": {
-      "type": "string",
-      "format": "date"
-    },
-    "sla_coverage": {
-      "type": "string",
-      "description": "SLA terms and uptime guarantee"
     },
     "due_diligence_status": {
       "type": "string",
@@ -208,10 +327,6 @@
         "na"
       ],
       "default": "under_review"
-    },
-    "owner": {
-      "type": "string",
-      "description": "Person responsible for vendor management"
     },
     "notes": {
       "type": "string",
