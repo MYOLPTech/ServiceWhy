@@ -35,10 +35,11 @@ export default function Controls() {
     return ids ? { ids: ids.split(','), label: label || 'Obligation' } : null;
   }, [location.search]);
 
-  const { data: controls = [], isLoading } = useQuery({
+  const { data: allControls = [], isLoading } = useQuery({
     queryKey: ['controls'],
     queryFn: () => base44.entities.Control.list('-created_date'),
   });
+  const controls = allControls.filter(c => !c.is_deleted);
 
   const createMutation = useMutation({
     mutationFn: (data) => base44.entities.Control.create(data),
@@ -51,7 +52,7 @@ export default function Controls() {
   });
 
   const deleteMutation = useMutation({
-    mutationFn: (id) => base44.entities.Control.delete(id),
+    mutationFn: (id) => base44.entities.Control.update(id, { is_deleted: true, deleted_date: new Date().toISOString() }),
     onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['controls'] }); setDeleteId(null); },
   });
 

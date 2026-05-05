@@ -158,10 +158,15 @@ export default function ObligationRegister() {
     queryFn: () => base44.entities.Obligation.list('-created_date'),
   });
 
-  const { data: risks = [] } = useQuery({ queryKey: ['risks'], queryFn: () => base44.entities.Risk.list() });
-  const { data: controls = [] } = useQuery({ queryKey: ['controls'], queryFn: () => base44.entities.Control.list() });
-  const { data: policies = [] } = useQuery({ queryKey: ['policies'], queryFn: () => base44.entities.Policy.list() });
-  const { data: tasks = [] } = useQuery({ queryKey: ['tasks'], queryFn: () => base44.entities.Task.list() });
+  const { data: allRisks = [] } = useQuery({ queryKey: ['risks'], queryFn: () => base44.entities.Risk.list() });
+  const { data: allControls = [] } = useQuery({ queryKey: ['controls'], queryFn: () => base44.entities.Control.list() });
+  const { data: allPolicies = [] } = useQuery({ queryKey: ['policies'], queryFn: () => base44.entities.Policy.list() });
+  const { data: allTasks = [] } = useQuery({ queryKey: ['tasks'], queryFn: () => base44.entities.Task.list() });
+  
+  const risks = allRisks.filter(r => !r.is_deleted);
+  const controls = allControls.filter(c => !c.is_deleted);
+  const policies = allPolicies.filter(p => !p.is_deleted);
+  const tasks = allTasks.filter(t => !t.is_deleted);
 
   const riskMap = Object.fromEntries(risks.map(r => [r.id, r.title]));
   const controlMap = Object.fromEntries(controls.map(c => [c.id, c.title]));

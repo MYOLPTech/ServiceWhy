@@ -23,10 +23,11 @@ export default function Dashboard() {
     queryKey: ['risks'],
     queryFn: () => base44.entities.Risk.list(),
   });
-  const { data: policies = [] } = useQuery({
+  const { data: allPolicies = [] } = useQuery({
     queryKey: ['policies'],
     queryFn: () => base44.entities.Policy.list(),
   });
+  const policies = allPolicies.filter(p => !p.is_deleted);
   const { data: evidence = [] } = useQuery({
     queryKey: ['evidence'],
     queryFn: () => base44.entities.Evidence.list(),

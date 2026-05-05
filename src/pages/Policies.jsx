@@ -20,6 +20,7 @@ export default function Policies() {
   const queryClient = useQueryClient();
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
+  const [showDeleted, setShowDeleted] = useState(false);
   const [formOpen, setFormOpen] = useState(false);
   const [editing, setEditing] = useState(null);
   const [deleteId, setDeleteId] = useState(null);
@@ -41,7 +42,7 @@ export default function Policies() {
     onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['policies'] }); setFormOpen(false); setEditing(null); },
   });
   const deleteMutation = useMutation({
-    mutationFn: (id) => base44.entities.Policy.delete(id),
+    mutationFn: (id) => base44.entities.Policy.update(id, { is_deleted: true, deleted_date: new Date().toISOString() }),
     onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['policies'] }); setDeleteId(null); },
   });
 
@@ -53,7 +54,8 @@ export default function Policies() {
   const filtered = policies.filter(p => {
     const matchesSearch = !search || p.title?.toLowerCase().includes(search.toLowerCase());
     const matchesStatus = statusFilter === 'all' || p.status === statusFilter;
-    return matchesSearch && matchesStatus;
+    const matchesDeleted = showDeleted || !p.is_deleted;
+    return matchesSearch && matchesStatus && matchesDeleted;
   });
 
   return (
@@ -64,22 +66,25 @@ export default function Policies() {
         actions={<Button onClick={() => { setEditing(null); setFormOpen(true); }} className="gap-2"><Plus className="w-4 h-4" /> Add Policy</Button>}
       />
       <div className="flex flex-wrap items-center gap-3 mb-6">
-        <div className="relative flex-1 min-w-[200px] max-w-sm">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-          <Input placeholder="Search policies..." value={search} onChange={e => setSearch(e.target.value)} className="pl-9" />
-        </div>
-        <Select value={statusFilter} onValueChange={setStatusFilter}>
-          <SelectTrigger className="w-40"><SelectValue /></SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">All Status</SelectItem>
-            <SelectItem value="draft">Draft</SelectItem>
-            <SelectItem value="in_review">In Review</SelectItem>
-            <SelectItem value="approved">Approved</SelectItem>
-            <SelectItem value="published">Published</SelectItem>
-            <SelectItem value="retired">Retired</SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
+         <div className="relative flex-1 min-w-[200px] max-w-sm">
+           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+           <Input placeholder="Search policies..." value={search} onChange={e => setSearch(e.target.value)} className="pl-9" />
+         </div>
+         <Select value={statusFilter} onValueChange={setStatusFilter}>
+           <SelectTrigger className="w-40"><SelectValue /></SelectTrigger>
+           <SelectContent>
+             <SelectItem value="all">All Status</SelectItem>
+             <SelectItem value="draft">Draft</SelectItem>
+             <SelectItem value="in_review">In Review</SelectItem>
+             <SelectItem value="approved">Approved</SelectItem>
+             <SelectItem value="published">Published</SelectItem>
+             <SelectItem value="retired">Retired</SelectItem>
+           </SelectContent>
+         </Select>
+         <Button variant={showDeleted ? 'default' : 'outline'} onClick={() => setShowDeleted(!showDeleted)} className="gap-2">
+           {showDeleted ? 'Hiding' : 'Show'} Deleted
+         </Button>
+       </div>
 
       <div className="bg-card rounded-2xl border border-border/50 shadow-sm overflow-hidden">
         {filtered.length === 0 ? (

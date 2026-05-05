@@ -38,11 +38,17 @@ function ChecklistSection({ title, items, color }) {
 }
 
 export default function AuditReadiness() {
-  const { data: controls = [] } = useQuery({ queryKey: ['controls'], queryFn: () => base44.entities.Control.list() });
-  const { data: evidence = [] } = useQuery({ queryKey: ['evidence'], queryFn: () => base44.entities.Evidence.list() });
-  const { data: risks = [] } = useQuery({ queryKey: ['risks'], queryFn: () => base44.entities.Risk.list() });
-  const { data: policies = [] } = useQuery({ queryKey: ['policies'], queryFn: () => base44.entities.Policy.list() });
-  const { data: tasks = [] } = useQuery({ queryKey: ['tasks'], queryFn: () => base44.entities.Task.list() });
+  const { data: allControls = [] } = useQuery({ queryKey: ['controls'], queryFn: () => base44.entities.Control.list() });
+  const { data: allEvidence = [] } = useQuery({ queryKey: ['evidence'], queryFn: () => base44.entities.Evidence.list() });
+  const { data: allRisks = [] } = useQuery({ queryKey: ['risks'], queryFn: () => base44.entities.Risk.list() });
+  const { data: allPolicies = [] } = useQuery({ queryKey: ['policies'], queryFn: () => base44.entities.Policy.list() });
+  const { data: allTasks = [] } = useQuery({ queryKey: ['tasks'], queryFn: () => base44.entities.Task.list() });
+  
+  const controls = allControls.filter(c => !c.is_deleted);
+  const evidence = allEvidence.filter(e => !e.is_deleted);
+  const risks = allRisks.filter(r => !r.is_deleted);
+  const policies = allPolicies.filter(p => !p.is_deleted);
+  const tasks = allTasks.filter(t => !t.is_deleted);
 
   const buildChecklist = (framework) => {
     const fwControls = controls.filter(c => c.framework === framework);

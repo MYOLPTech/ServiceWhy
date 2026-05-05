@@ -45,10 +45,11 @@ export default function Cmdb() {
   const [editingItem, setEditingItem] = useState(null);
   const [deleteId, setDeleteId] = useState(null);
 
-  const { data: items = [], isLoading } = useQuery({
+  const { data: allItems = [], isLoading } = useQuery({
     queryKey: ['cmdb'],
     queryFn: () => base44.entities.CmdbItem.list('-created_date'),
   });
+  const items = allItems.filter(i => !i.is_deleted);
 
   const createMutation = useMutation({
     mutationFn: (data) => base44.entities.CmdbItem.create(data),
@@ -61,7 +62,7 @@ export default function Cmdb() {
   });
 
   const deleteMutation = useMutation({
-    mutationFn: (id) => base44.entities.CmdbItem.delete(id),
+    mutationFn: (id) => base44.entities.CmdbItem.update(id, { is_deleted: true, deleted_date: new Date().toISOString() }),
     onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['cmdb'] }); setDeleteId(null); },
   });
 
