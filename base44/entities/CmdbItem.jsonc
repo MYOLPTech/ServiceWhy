@@ -151,6 +151,13 @@
       },
       "description": "IDs of linked Evidence records"
     },
+    "linked_vendor_ids": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "IDs of linked Vendor records"
+    },
     "notes": {
       "type": "string",
       "description": "Additional notes or configuration details"

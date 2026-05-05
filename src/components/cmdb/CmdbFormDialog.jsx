@@ -22,7 +22,7 @@ const DEFAULT = {
   criticality: 'medium', environment: 'production', owner: '', location: '', vendor: '',
   version: '', ip_address: '', os: '', description: '', data_classification: 'internal',
   last_reviewed: '', decommission_date: '', notes: '',
-  linked_control_ids: [], linked_risk_ids: [], linked_task_ids: [], linked_evidence_ids: []
+  linked_control_ids: [], linked_risk_ids: [], linked_task_ids: [], linked_evidence_ids: [], linked_vendor_ids: []
 };
 
 export default function CmdbFormDialog({ open, onOpenChange, item, onSave, saving }) {
@@ -43,6 +43,7 @@ export default function CmdbFormDialog({ open, onOpenChange, item, onSave, savin
   const { data: risks = [] } = useQuery({ queryKey: ['risks'], queryFn: () => base44.entities.Risk.list() });
   const { data: tasks = [] } = useQuery({ queryKey: ['tasks'], queryFn: () => base44.entities.Task.list() });
   const { data: evidence = [] } = useQuery({ queryKey: ['evidence'], queryFn: () => base44.entities.Evidence.list() });
+  const { data: vendors = [] } = useQuery({ queryKey: ['vendors'], queryFn: () => base44.entities.Vendor.list() });
 
   const set = (k, v) => setForm(f => ({ ...f, [k]: v }));
 
@@ -206,6 +207,8 @@ export default function CmdbFormDialog({ open, onOpenChange, item, onSave, savin
                 renderLabel={t => `${t.task_id ? t.task_id + ' – ' : ''}${t.title}`} renderSub={t => t.status} />
               <LinkSection label="Evidence" items={evidence} selected={form.linked_evidence_ids} onToggle={id => toggleLink('linked_evidence_ids', id)}
                 renderLabel={e => e.title} renderSub={e => e.status} />
+              <LinkSection label="Vendors" items={vendors} selected={form.linked_vendor_ids} onToggle={id => toggleLink('linked_vendor_ids', id)}
+                renderLabel={v => `${v.vendor_id ? v.vendor_id + ' – ' : ''}${v.name}`} renderSub={v => v.category?.replace(/_/g, ' ')} />
             </TabsContent>
           </Tabs>
         </div>
