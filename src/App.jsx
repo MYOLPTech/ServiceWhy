@@ -13,6 +13,7 @@ import Risks from './pages/Risks';
 import Policies from './pages/Policies';
 import Tasks from './pages/Tasks';
 import AuditReadiness from './pages/AuditReadiness';
+import ObligationRegister from './pages/ObligationRegister';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
@@ -48,6 +49,7 @@ const AuthenticatedApp = () => {
         <Route path="/policies" element={<Policies />} />
         <Route path="/tasks" element={<Tasks />} />
         <Route path="/audit" element={<AuditReadiness />} />
+        <Route path="/obligations" element={<ObligationRegister />} />
       </Route>
       <Route path="*" element={<PageNotFound />} />
     </Routes>
