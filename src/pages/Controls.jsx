@@ -21,12 +21,19 @@ export default function Controls() {
   const [search, setSearch] = useState('');
   const [frameworkFilter, setFrameworkFilter] = useState('all');
   const [statusFilter, setStatusFilter] = useState('all');
+  const [sortBy, setSortBy] = useState('control_id');
+  const [sortDir, setSortDir] = useState('asc');
   const [formOpen, setFormOpen] = useState(false);
   const [editingControl, setEditingControl] = useState(null);
   const [deleteId, setDeleteId] = useState(null);
   const [guideControl, setGuideControl] = useState(null);
   const [detailControl, setDetailControl] = useState(null);
   const [detailOpen, setDetailOpen] = useState(false);
+
+  const handleSort = (column) => {
+    if (sortBy === column) setSortDir(sortDir === 'asc' ? 'desc' : 'asc');
+    else { setSortBy(column); setSortDir('asc'); }
+  };
   const location = useLocation();
   const obligationFilter = useMemo(() => {
     const params = new URLSearchParams(location.search);
@@ -70,6 +77,14 @@ export default function Controls() {
     const matchesStatus = statusFilter === 'all' || c.status === statusFilter;
     const matchesObligation = !obligationFilter || obligationFilter.ids.includes(c.id) || obligationFilter.ids.includes(c.control_id);
     return matchesSearch && matchesFramework && matchesStatus && matchesObligation;
+  }).sort((a, b) => {
+    let aVal = a[sortBy] || '';
+    let bVal = b[sortBy] || '';
+    if (typeof aVal === 'string') aVal = aVal.toLowerCase();
+    if (typeof bVal === 'string') bVal = bVal.toLowerCase();
+    if (aVal < bVal) return sortDir === 'asc' ? -1 : 1;
+    if (aVal > bVal) return sortDir === 'asc' ? 1 : -1;
+    return 0;
   });
 
   return (
@@ -132,13 +147,13 @@ export default function Controls() {
           <Table>
             <TableHeader>
               <TableRow className="bg-muted/30">
-                <TableHead className="w-24">ID</TableHead>
-                <TableHead>Title</TableHead>
-                <TableHead>Framework</TableHead>
-                <TableHead>Category</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Priority</TableHead>
-                <TableHead>Owner</TableHead>
+                <TableHead className="w-24 cursor-pointer hover:bg-muted/50" onClick={() => handleSort('control_id')}>ID {sortBy === 'control_id' && (sortDir === 'asc' ? '↑' : '↓')}</TableHead>
+                <TableHead className="cursor-pointer hover:bg-muted/50" onClick={() => handleSort('title')}>Title {sortBy === 'title' && (sortDir === 'asc' ? '↑' : '↓')}</TableHead>
+                <TableHead className="cursor-pointer hover:bg-muted/50" onClick={() => handleSort('framework')}>Framework {sortBy === 'framework' && (sortDir === 'asc' ? '↑' : '↓')}</TableHead>
+                <TableHead className="cursor-pointer hover:bg-muted/50" onClick={() => handleSort('category')}>Category {sortBy === 'category' && (sortDir === 'asc' ? '↑' : '↓')}</TableHead>
+                <TableHead className="cursor-pointer hover:bg-muted/50" onClick={() => handleSort('status')}>Status {sortBy === 'status' && (sortDir === 'asc' ? '↑' : '↓')}</TableHead>
+                <TableHead className="cursor-pointer hover:bg-muted/50" onClick={() => handleSort('priority')}>Priority {sortBy === 'priority' && (sortDir === 'asc' ? '↑' : '↓')}</TableHead>
+                <TableHead className="cursor-pointer hover:bg-muted/50" onClick={() => handleSort('owner')}>Owner {sortBy === 'owner' && (sortDir === 'asc' ? '↑' : '↓')}</TableHead>
                 <TableHead className="w-20" />
               </TableRow>
             </TableHeader>

@@ -22,10 +22,17 @@ export default function Tasks() {
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [frameworkFilter, setFrameworkFilter] = useState('all');
+  const [sortBy, setSortBy] = useState('task_id');
+  const [sortDir, setSortDir] = useState('asc');
   const [formOpen, setFormOpen] = useState(false);
   const [editing, setEditing] = useState(null);
   const [deleteId, setDeleteId] = useState(null);
   const [guideTask, setGuideTask] = useState(null);
+
+  const handleSort = (column) => {
+    if (sortBy === column) setSortDir(sortDir === 'asc' ? 'desc' : 'asc');
+    else { setSortBy(column); setSortDir('asc'); }
+  };
   const location = useLocation();
   const obligationFilter = useMemo(() => {
     const params = new URLSearchParams(location.search);
@@ -70,6 +77,14 @@ export default function Tasks() {
     const matchesFramework = frameworkFilter === 'all' || t.framework === frameworkFilter;
     const matchesObligation = !obligationFilter || obligationFilter.ids.includes(t.id) || obligationFilter.ids.includes(t.task_id);
     return matchesSearch && matchesStatus && matchesFramework && matchesObligation;
+  }).sort((a, b) => {
+    let aVal = a[sortBy] || '';
+    let bVal = b[sortBy] || '';
+    if (typeof aVal === 'string') aVal = aVal.toLowerCase();
+    if (typeof bVal === 'string') bVal = bVal.toLowerCase();
+    if (aVal < bVal) return sortDir === 'asc' ? -1 : 1;
+    if (aVal > bVal) return sortDir === 'asc' ? 1 : -1;
+    return 0;
   });
 
   const isOverdue = (t) => t.due_date && new Date(t.due_date) < new Date() && t.status !== 'completed';
@@ -122,14 +137,14 @@ export default function Tasks() {
           <Table>
             <TableHeader>
               <TableRow className="bg-muted/30">
-                <TableHead className="w-24">ID</TableHead>
-                <TableHead>Task</TableHead>
-                <TableHead>Type</TableHead>
-                <TableHead>Framework</TableHead>
-                <TableHead>Priority</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Assignee</TableHead>
-                <TableHead>Due Date</TableHead>
+                <TableHead className="w-24 cursor-pointer hover:bg-muted/50" onClick={() => handleSort('task_id')}>ID {sortBy === 'task_id' && (sortDir === 'asc' ? '↑' : '↓')}</TableHead>
+                <TableHead className="cursor-pointer hover:bg-muted/50" onClick={() => handleSort('title')}>Task {sortBy === 'title' && (sortDir === 'asc' ? '↑' : '↓')}</TableHead>
+                <TableHead className="cursor-pointer hover:bg-muted/50" onClick={() => handleSort('type')}>Type {sortBy === 'type' && (sortDir === 'asc' ? '↑' : '↓')}</TableHead>
+                <TableHead className="cursor-pointer hover:bg-muted/50" onClick={() => handleSort('framework')}>Framework {sortBy === 'framework' && (sortDir === 'asc' ? '↑' : '↓')}</TableHead>
+                <TableHead className="cursor-pointer hover:bg-muted/50" onClick={() => handleSort('priority')}>Priority {sortBy === 'priority' && (sortDir === 'asc' ? '↑' : '↓')}</TableHead>
+                <TableHead className="cursor-pointer hover:bg-muted/50" onClick={() => handleSort('status')}>Status {sortBy === 'status' && (sortDir === 'asc' ? '↑' : '↓')}</TableHead>
+                <TableHead className="cursor-pointer hover:bg-muted/50" onClick={() => handleSort('assignee')}>Assignee {sortBy === 'assignee' && (sortDir === 'asc' ? '↑' : '↓')}</TableHead>
+                <TableHead className="cursor-pointer hover:bg-muted/50" onClick={() => handleSort('due_date')}>Due Date {sortBy === 'due_date' && (sortDir === 'asc' ? '↑' : '↓')}</TableHead>
                 <TableHead className="w-20" />
               </TableRow>
             </TableHeader>

@@ -17,9 +17,16 @@ export default function Evidence() {
   const queryClient = useQueryClient();
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
+  const [sortBy, setSortBy] = useState('title');
+  const [sortDir, setSortDir] = useState('asc');
   const [formOpen, setFormOpen] = useState(false);
   const [editing, setEditing] = useState(null);
   const [deleteId, setDeleteId] = useState(null);
+
+  const handleSort = (column) => {
+    if (sortBy === column) setSortDir(sortDir === 'asc' ? 'desc' : 'asc');
+    else { setSortBy(column); setSortDir('asc'); }
+  };
 
   const { data: allEvidence = [] } = useQuery({
     queryKey: ['evidence'],
@@ -65,6 +72,14 @@ export default function Evidence() {
     const matchesSearch = !search || e.title?.toLowerCase().includes(search.toLowerCase());
     const matchesStatus = statusFilter === 'all' || e.status === statusFilter;
     return matchesSearch && matchesStatus;
+  }).sort((a, b) => {
+    let aVal = a[sortBy] || '';
+    let bVal = b[sortBy] || '';
+    if (typeof aVal === 'string') aVal = aVal.toLowerCase();
+    if (typeof bVal === 'string') bVal = bVal.toLowerCase();
+    if (aVal < bVal) return sortDir === 'asc' ? -1 : 1;
+    if (aVal > bVal) return sortDir === 'asc' ? 1 : -1;
+    return 0;
   });
 
   return (
@@ -103,11 +118,11 @@ export default function Evidence() {
           <Table>
             <TableHeader>
               <TableRow className="bg-muted/30">
-                <TableHead>Title</TableHead>
-                <TableHead>Linked Control</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Uploaded</TableHead>
-                <TableHead>Expiry</TableHead>
+                <TableHead className="cursor-pointer hover:bg-muted/50" onClick={() => handleSort('title')}>Title {sortBy === 'title' && (sortDir === 'asc' ? '↑' : '↓')}</TableHead>
+                <TableHead className="cursor-pointer hover:bg-muted/50" onClick={() => handleSort('control_id')}>Linked Control {sortBy === 'control_id' && (sortDir === 'asc' ? '↑' : '↓')}</TableHead>
+                <TableHead className="cursor-pointer hover:bg-muted/50" onClick={() => handleSort('status')}>Status {sortBy === 'status' && (sortDir === 'asc' ? '↑' : '↓')}</TableHead>
+                <TableHead className="cursor-pointer hover:bg-muted/50" onClick={() => handleSort('created_date')}>Uploaded {sortBy === 'created_date' && (sortDir === 'asc' ? '↑' : '↓')}</TableHead>
+                <TableHead className="cursor-pointer hover:bg-muted/50" onClick={() => handleSort('expiry_date')}>Expiry {sortBy === 'expiry_date' && (sortDir === 'asc' ? '↑' : '↓')}</TableHead>
                 <TableHead className="w-28" />
               </TableRow>
             </TableHeader>

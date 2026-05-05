@@ -21,12 +21,19 @@ export default function Policies() {
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [showDeleted, setShowDeleted] = useState(false);
+  const [sortBy, setSortBy] = useState('review_date');
+  const [sortDir, setSortDir] = useState('desc');
   const [formOpen, setFormOpen] = useState(false);
   const [editing, setEditing] = useState(null);
   const [deleteId, setDeleteId] = useState(null);
   const [viewingPolicy, setViewingPolicy] = useState(null);
   const [detailOpen, setDetailOpen] = useState(false);
   const [selectedPolicy, setSelectedPolicy] = useState(null);
+
+  const handleSort = (column) => {
+    if (sortBy === column) setSortDir(sortDir === 'asc' ? 'desc' : 'asc');
+    else { setSortBy(column); setSortDir('asc'); }
+  };
 
   const { data: policies = [] } = useQuery({
     queryKey: ['policies'],
@@ -56,6 +63,16 @@ export default function Policies() {
     const matchesStatus = statusFilter === 'all' || p.status === statusFilter;
     const matchesDeleted = showDeleted || !p.is_deleted;
     return matchesSearch && matchesStatus && matchesDeleted;
+  }).sort((a, b) => {
+    let aVal = a[sortBy] || '';
+    let bVal = b[sortBy] || '';
+    if (Array.isArray(aVal)) aVal = aVal.length;
+    if (Array.isArray(bVal)) bVal = bVal.length;
+    if (typeof aVal === 'string') aVal = aVal.toLowerCase();
+    if (typeof bVal === 'string') bVal = bVal.toLowerCase();
+    if (aVal < bVal) return sortDir === 'asc' ? -1 : 1;
+    if (aVal > bVal) return sortDir === 'asc' ? 1 : -1;
+    return 0;
   });
 
   return (
@@ -92,17 +109,17 @@ export default function Policies() {
         ) : (
           <Table>
             <TableHeader>
-              <TableRow className="bg-muted/30">
-                <TableHead className="w-24">ID</TableHead>
-                <TableHead>Title</TableHead>
-                <TableHead>Category</TableHead>
-                <TableHead>Frameworks</TableHead>
-                <TableHead>Version</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Owner</TableHead>
-                <TableHead>Review Date</TableHead>
-                <TableHead className="w-28" />
-              </TableRow>
+             <TableRow className="bg-muted/30">
+               <TableHead className="w-24 cursor-pointer hover:bg-muted/50" onClick={() => handleSort('policy_id')}>ID {sortBy === 'policy_id' && (sortDir === 'asc' ? '↑' : '↓')}</TableHead>
+               <TableHead className="cursor-pointer hover:bg-muted/50" onClick={() => handleSort('title')}>Title {sortBy === 'title' && (sortDir === 'asc' ? '↑' : '↓')}</TableHead>
+               <TableHead className="cursor-pointer hover:bg-muted/50" onClick={() => handleSort('category')}>Category {sortBy === 'category' && (sortDir === 'asc' ? '↑' : '↓')}</TableHead>
+               <TableHead className="cursor-pointer hover:bg-muted/50" onClick={() => handleSort('frameworks')}>Frameworks {sortBy === 'frameworks' && (sortDir === 'asc' ? '↑' : '↓')}</TableHead>
+               <TableHead className="cursor-pointer hover:bg-muted/50" onClick={() => handleSort('version')}>Version {sortBy === 'version' && (sortDir === 'asc' ? '↑' : '↓')}</TableHead>
+               <TableHead className="cursor-pointer hover:bg-muted/50" onClick={() => handleSort('status')}>Status {sortBy === 'status' && (sortDir === 'asc' ? '↑' : '↓')}</TableHead>
+               <TableHead className="cursor-pointer hover:bg-muted/50" onClick={() => handleSort('owner')}>Owner {sortBy === 'owner' && (sortDir === 'asc' ? '↑' : '↓')}</TableHead>
+               <TableHead className="cursor-pointer hover:bg-muted/50" onClick={() => handleSort('review_date')}>Review Date {sortBy === 'review_date' && (sortDir === 'asc' ? '↑' : '↓')}</TableHead>
+               <TableHead className="w-28" />
+             </TableRow>
             </TableHeader>
             <TableBody>
               {filtered.map(p => (

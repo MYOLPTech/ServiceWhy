@@ -24,10 +24,17 @@ export default function Risks() {
   const queryClient = useQueryClient();
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
+  const [sortBy, setSortBy] = useState('risk_id');
+  const [sortDir, setSortDir] = useState('asc');
   const [formOpen, setFormOpen] = useState(false);
   const [editing, setEditing] = useState(null);
   const [deleteId, setDeleteId] = useState(null);
   const [guideRisk, setGuideRisk] = useState(null);
+
+  const handleSort = (column) => {
+    if (sortBy === column) setSortDir(sortDir === 'asc' ? 'desc' : 'asc');
+    else { setSortBy(column); setSortDir('asc'); }
+  };
   const location = useLocation();
   const obligationFilter = useMemo(() => {
     const params = new URLSearchParams(location.search);
@@ -70,6 +77,14 @@ export default function Risks() {
     const matchesStatus = statusFilter === 'all' || r.status === statusFilter;
     const matchesObligation = !obligationFilter || obligationFilter.ids.includes(r.id) || obligationFilter.ids.includes(r.risk_id);
     return matchesSearch && matchesStatus && matchesObligation;
+  }).sort((a, b) => {
+    let aVal = a[sortBy] || '';
+    let bVal = b[sortBy] || '';
+    if (typeof aVal === 'string') aVal = aVal.toLowerCase();
+    if (typeof bVal === 'string') bVal = bVal.toLowerCase();
+    if (aVal < bVal) return sortDir === 'asc' ? -1 : 1;
+    if (aVal > bVal) return sortDir === 'asc' ? 1 : -1;
+    return 0;
   });
 
   return (
@@ -116,15 +131,15 @@ export default function Risks() {
           <Table>
             <TableHeader>
               <TableRow className="bg-muted/30">
-                <TableHead className="w-24">ID</TableHead>
-                <TableHead>Risk</TableHead>
-                <TableHead>Category</TableHead>
-                <TableHead className="text-center">Likelihood</TableHead>
-                <TableHead className="text-center">Impact</TableHead>
-                <TableHead className="text-center">Score</TableHead>
-                <TableHead>Treatment</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Owner</TableHead>
+                <TableHead className="w-24 cursor-pointer hover:bg-muted/50" onClick={() => handleSort('risk_id')}>ID {sortBy === 'risk_id' && (sortDir === 'asc' ? '↑' : '↓')}</TableHead>
+                <TableHead className="cursor-pointer hover:bg-muted/50" onClick={() => handleSort('title')}>Risk {sortBy === 'title' && (sortDir === 'asc' ? '↑' : '↓')}</TableHead>
+                <TableHead className="cursor-pointer hover:bg-muted/50" onClick={() => handleSort('category')}>Category {sortBy === 'category' && (sortDir === 'asc' ? '↑' : '↓')}</TableHead>
+                <TableHead className="text-center cursor-pointer hover:bg-muted/50" onClick={() => handleSort('likelihood')}>Likelihood {sortBy === 'likelihood' && (sortDir === 'asc' ? '↑' : '↓')}</TableHead>
+                <TableHead className="text-center cursor-pointer hover:bg-muted/50" onClick={() => handleSort('impact')}>Impact {sortBy === 'impact' && (sortDir === 'asc' ? '↑' : '↓')}</TableHead>
+                <TableHead className="text-center cursor-pointer hover:bg-muted/50" onClick={() => handleSort('risk_score')}>Score {sortBy === 'risk_score' && (sortDir === 'asc' ? '↑' : '↓')}</TableHead>
+                <TableHead className="cursor-pointer hover:bg-muted/50" onClick={() => handleSort('treatment')}>Treatment {sortBy === 'treatment' && (sortDir === 'asc' ? '↑' : '↓')}</TableHead>
+                <TableHead className="cursor-pointer hover:bg-muted/50" onClick={() => handleSort('status')}>Status {sortBy === 'status' && (sortDir === 'asc' ? '↑' : '↓')}</TableHead>
+                <TableHead className="cursor-pointer hover:bg-muted/50" onClick={() => handleSort('owner')}>Owner {sortBy === 'owner' && (sortDir === 'asc' ? '↑' : '↓')}</TableHead>
                 <TableHead className="w-20" />
               </TableRow>
             </TableHeader>

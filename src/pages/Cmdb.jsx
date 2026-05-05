@@ -41,9 +41,16 @@ export default function Cmdb() {
   const [typeFilter, setTypeFilter] = useState('all');
   const [statusFilter, setStatusFilter] = useState('all');
   const [critFilter, setCritFilter] = useState('all');
+  const [sortBy, setSortBy] = useState('name');
+  const [sortDir, setSortDir] = useState('asc');
   const [formOpen, setFormOpen] = useState(false);
   const [editingItem, setEditingItem] = useState(null);
   const [deleteId, setDeleteId] = useState(null);
+
+  const handleSort = (column) => {
+    if (sortBy === column) setSortDir(sortDir === 'asc' ? 'desc' : 'asc');
+    else { setSortBy(column); setSortDir('asc'); }
+  };
 
   const { data: allItems = [], isLoading } = useQuery({
     queryKey: ['cmdb'],
@@ -80,7 +87,15 @@ export default function Cmdb() {
     const matchesStatus = statusFilter === 'all' || item.status === statusFilter;
     const matchesCrit = critFilter === 'all' || item.criticality === critFilter;
     return matchesSearch && matchesType && matchesStatus && matchesCrit;
-  }), [items, search, typeFilter, statusFilter, critFilter]);
+  }).sort((a, b) => {
+    let aVal = a[sortBy] || '';
+    let bVal = b[sortBy] || '';
+    if (typeof aVal === 'string') aVal = aVal.toLowerCase();
+    if (typeof bVal === 'string') bVal = bVal.toLowerCase();
+    if (aVal < bVal) return sortDir === 'asc' ? -1 : 1;
+    if (aVal > bVal) return sortDir === 'asc' ? 1 : -1;
+    return 0;
+  }), [items, search, typeFilter, statusFilter, critFilter, sortBy, sortDir]);
 
   const linkCount = (item) => {
     return (item.linked_control_ids?.length || 0) + (item.linked_risk_ids?.length || 0) + (item.linked_task_ids?.length || 0) + (item.linked_evidence_ids?.length || 0);
@@ -166,13 +181,13 @@ export default function Cmdb() {
           <Table>
             <TableHeader>
               <TableRow className="bg-muted/30">
-                <TableHead className="w-24">ID</TableHead>
-                <TableHead>Name</TableHead>
-                <TableHead>Type</TableHead>
-                <TableHead>Environment</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Criticality</TableHead>
-                <TableHead>Owner</TableHead>
+                <TableHead className="w-24 cursor-pointer hover:bg-muted/50" onClick={() => handleSort('asset_id')}>ID {sortBy === 'asset_id' && (sortDir === 'asc' ? '↑' : '↓')}</TableHead>
+                <TableHead className="cursor-pointer hover:bg-muted/50" onClick={() => handleSort('name')}>Name {sortBy === 'name' && (sortDir === 'asc' ? '↑' : '↓')}</TableHead>
+                <TableHead className="cursor-pointer hover:bg-muted/50" onClick={() => handleSort('type')}>Type {sortBy === 'type' && (sortDir === 'asc' ? '↑' : '↓')}</TableHead>
+                <TableHead className="cursor-pointer hover:bg-muted/50" onClick={() => handleSort('environment')}>Environment {sortBy === 'environment' && (sortDir === 'asc' ? '↑' : '↓')}</TableHead>
+                <TableHead className="cursor-pointer hover:bg-muted/50" onClick={() => handleSort('status')}>Status {sortBy === 'status' && (sortDir === 'asc' ? '↑' : '↓')}</TableHead>
+                <TableHead className="cursor-pointer hover:bg-muted/50" onClick={() => handleSort('criticality')}>Criticality {sortBy === 'criticality' && (sortDir === 'asc' ? '↑' : '↓')}</TableHead>
+                <TableHead className="cursor-pointer hover:bg-muted/50" onClick={() => handleSort('owner')}>Owner {sortBy === 'owner' && (sortDir === 'asc' ? '↑' : '↓')}</TableHead>
                 <TableHead>Links</TableHead>
                 <TableHead className="w-20" />
               </TableRow>
