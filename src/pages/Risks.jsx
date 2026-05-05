@@ -47,7 +47,7 @@ export default function Risks() {
     queryKey: ['risks'],
     queryFn: () => base44.entities.Risk.list('-created_date'),
   });
-  const risks = allRisks;
+  const risks = allRisks.filter(r => !r.is_deleted);
 
   const createMutation = useMutation({
     mutationFn: (data) => base44.entities.Risk.create(data),
@@ -60,7 +60,7 @@ export default function Risks() {
   });
 
   const deleteMutation = useMutation({
-    mutationFn: (id) => base44.entities.Risk.delete(id),
+    mutationFn: (id) => base44.entities.Risk.update(id, { is_deleted: true, deleted_date: new Date().toISOString() }),
     onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['risks'] }); setDeleteId(null); },
   });
 

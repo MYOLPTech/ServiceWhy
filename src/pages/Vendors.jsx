@@ -35,7 +35,7 @@ export default function Vendors() {
     queryKey: ['vendors'],
     queryFn: () => base44.entities.Vendor.list()
   });
-  const vendors = allVendors;
+  const vendors = allVendors.filter(v => !v.is_deleted);
 
   const createMutation = useMutation({
     mutationFn: (data) => base44.entities.Vendor.create(data),
@@ -56,7 +56,7 @@ export default function Vendors() {
   });
 
   const deleteMutation = useMutation({
-    mutationFn: (id) => base44.entities.Vendor.delete(id),
+    mutationFn: (id) => base44.entities.Vendor.update(id, { is_deleted: true, deleted_date: new Date().toISOString() }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['vendors'] });
       setDeleteTarget(null);

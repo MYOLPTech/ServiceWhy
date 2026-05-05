@@ -354,6 +354,16 @@
         "type": "string"
       },
       "description": "IDs of linked Task records"
+    },
+    "is_deleted": {
+      "type": "boolean",
+      "default": false,
+      "description": "Soft delete flag"
+    },
+    "deleted_date": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Date and time when deleted"
     }
   },
   "required": [

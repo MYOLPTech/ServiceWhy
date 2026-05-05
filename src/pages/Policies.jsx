@@ -23,6 +23,7 @@ export default function Policies() {
   const [sortBy, setSortBy] = useState('review_date');
   const [sortDir, setSortDir] = useState('desc');
   const [formOpen, setFormOpen] = useState(false);
+  const [showDeleted, setShowDeleted] = useState(false);
   const [editing, setEditing] = useState(null);
   const [deleteId, setDeleteId] = useState(null);
   const [viewingPolicy, setViewingPolicy] = useState(null);
@@ -48,7 +49,7 @@ export default function Policies() {
     onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['policies'] }); setFormOpen(false); setEditing(null); },
   });
   const deleteMutation = useMutation({
-    mutationFn: (id) => base44.entities.Policy.delete(id),
+    mutationFn: (id) => base44.entities.Policy.update(id, { is_deleted: true, deleted_date: new Date().toISOString() }),
     onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['policies'] }); setDeleteId(null); },
   });
 
@@ -60,7 +61,8 @@ export default function Policies() {
   const filtered = policies.filter(p => {
     const matchesSearch = !search || p.title?.toLowerCase().includes(search.toLowerCase());
     const matchesStatus = statusFilter === 'all' || p.status === statusFilter;
-    return matchesSearch && matchesStatus;
+    const matchesDeleted = showDeleted || !p.is_deleted;
+    return matchesSearch && matchesStatus && matchesDeleted;
   }).sort((a, b) => {
     let aVal = a[sortBy] || '';
     let bVal = b[sortBy] || '';
@@ -96,6 +98,9 @@ export default function Policies() {
              <SelectItem value="retired">Retired</SelectItem>
            </SelectContent>
          </Select>
+         <Button variant={showDeleted ? 'default' : 'outline'} onClick={() => setShowDeleted(!showDeleted)} className="gap-2">
+           {showDeleted ? 'Hiding' : 'Show'} Deleted
+         </Button>
          </div>
 
       <div className="bg-card rounded-2xl border border-border/50 shadow-sm overflow-hidden">

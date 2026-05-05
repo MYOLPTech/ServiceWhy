@@ -161,6 +161,16 @@
     "notes": {
       "type": "string",
       "description": "Additional notes or configuration details"
+    },
+    "is_deleted": {
+      "type": "boolean",
+      "default": false,
+      "description": "Soft delete flag"
+    },
+    "deleted_date": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Date and time when deleted"
     }
   },
   "required": [
