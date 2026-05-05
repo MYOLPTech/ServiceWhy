@@ -1,0 +1,247 @@
+{
+  "name": "Vendor",
+  "type": "object",
+  "properties": {
+    "vendor_id": {
+      "type": "string",
+      "description": "Unique vendor identifier (e.g. VND-001)"
+    },
+    "name": {
+      "type": "string",
+      "description": "Vendor/supplier name"
+    },
+    "description": {
+      "type": "string",
+      "description": "Description of vendor services"
+    },
+    "category": {
+      "type": "string",
+      "enum": [
+        "cloud_services",
+        "security",
+        "infrastructure",
+        "software",
+        "consulting",
+        "hardware",
+        "managed_services",
+        "audit_firms",
+        "telecommunications",
+        "other"
+      ],
+      "default": "software"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "active",
+        "inactive",
+        "under_review",
+        "pending_approval",
+        "offboarding"
+      ],
+      "default": "active"
+    },
+    "criticality": {
+      "type": "string",
+      "enum": [
+        "critical",
+        "high",
+        "medium",
+        "low"
+      ],
+      "default": "medium",
+      "description": "Criticality level for business operations"
+    },
+    "risk_level": {
+      "type": "string",
+      "enum": [
+        "critical",
+        "high",
+        "medium",
+        "low"
+      ],
+      "default": "medium"
+    },
+    "risk_score": {
+      "type": "number",
+      "description": "Calculated risk score (0-100)"
+    },
+    "risk_assessment": {
+      "type": "string",
+      "description": "Risk assessment findings"
+    },
+    "mitigation_strategy": {
+      "type": "string",
+      "description": "Plan to mitigate identified risks"
+    },
+    "primary_contact": {
+      "type": "string",
+      "description": "Primary contact person"
+    },
+    "contact_email": {
+      "type": "string",
+      "description": "Contact email address"
+    },
+    "contact_phone": {
+      "type": "string"
+    },
+    "website": {
+      "type": "string"
+    },
+    "data_access_level": {
+      "type": "string",
+      "enum": [
+        "none",
+        "public_only",
+        "internal",
+        "confidential",
+        "restricted"
+      ],
+      "default": "public_only",
+      "description": "Level of data access provided to vendor"
+    },
+    "contract_status": {
+      "type": "string",
+      "enum": [
+        "draft",
+        "signed",
+        "active",
+        "expired",
+        "terminated"
+      ],
+      "default": "draft"
+    },
+    "contract_start_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "contract_end_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "sla_coverage": {
+      "type": "string",
+      "description": "SLA terms and uptime guarantee"
+    },
+    "due_diligence_status": {
+      "type": "string",
+      "enum": [
+        "pending",
+        "in_progress",
+        "approved",
+        "rejected",
+        "under_review"
+      ],
+      "default": "pending"
+    },
+    "due_diligence_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "last_audit_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "next_audit_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "certifications": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "enum": [
+              "SOC2 Type I",
+              "SOC2 Type II",
+              "ISO27001",
+              "ISO27002",
+              "ISO9001",
+              "ASAE3150",
+              "GDPR",
+              "HIPAA",
+              "PCI-DSS",
+              "other"
+            ]
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "not_required",
+              "required",
+              "planned",
+              "in_progress",
+              "certified",
+              "expired"
+            ]
+          },
+          "issue_date": {
+            "type": "string",
+            "format": "date"
+          },
+          "expiry_date": {
+            "type": "string",
+            "format": "date"
+          },
+          "certificate_url": {
+            "type": "string"
+          }
+        }
+      },
+      "description": "List of certifications held by vendor"
+    },
+    "applicable_frameworks": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Applicable frameworks (SOC2, ISO27001, ASAE3150, etc.)"
+    },
+    "compliance_status": {
+      "type": "string",
+      "enum": [
+        "compliant",
+        "non_compliant",
+        "under_review",
+        "na"
+      ],
+      "default": "under_review"
+    },
+    "owner": {
+      "type": "string",
+      "description": "Person responsible for vendor management"
+    },
+    "notes": {
+      "type": "string",
+      "description": "Additional notes and observations"
+    },
+    "linked_control_ids": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "IDs of linked Control records"
+    },
+    "linked_risk_ids": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "IDs of linked Risk records"
+    },
+    "linked_task_ids": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "IDs of linked Task records"
+    }
+  },
+  "required": [
+    "name",
+    "category",
+    "status"
+  ]
+}

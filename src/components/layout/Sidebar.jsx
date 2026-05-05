@@ -2,7 +2,7 @@ import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import {
   LayoutDashboard, Shield, FileCheck, AlertTriangle,
-  FileText, CheckSquare, ClipboardCheck, Settings, LogOut, ChevronLeft, ChevronRight, BookMarked, Database
+  FileText, CheckSquare, ClipboardCheck, Settings, LogOut, ChevronLeft, ChevronRight, BookMarked, Database, Building
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { base44 } from '@/api/base44Client';
@@ -18,6 +18,7 @@ const navItems = [
   { icon: ClipboardCheck, label: 'Audit Readiness', path: '/audit' },
   { icon: BookMarked, label: 'Obligations', path: '/obligations' },
   { icon: Database, label: 'CMDB', path: '/cmdb' },
+  { icon: Building, label: 'Vendors', path: '/vendors' },
 ];
 
 export default function Sidebar() {
