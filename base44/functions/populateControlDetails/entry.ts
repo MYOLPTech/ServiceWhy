@@ -9,20 +9,22 @@ Deno.serve(async (req) => {
       return Response.json({ error: 'Forbidden: Admin access required' }, { status: 403 });
     }
 
-    // Fetch all controls
-    const controls = await base44.entities.Control.list('-created_date');
-    const updated = [];
-    const failed = [];
+    const payload = await req.json().catch(() => ({}));
+    const controlId = payload.control_id;
 
-    for (const control of controls) {
-      try {
-        // Skip if already has implementation details
-        if (control.implementation_overview && control.implementation_overview.length > 100) {
-          updated.push({ id: control.id, status: 'skipped', reason: 'Already populated' });
-          continue;
-        }
+    // If control_id provided, populate just that one
+    if (controlId) {
+      const control = await base44.entities.Control.get(controlId);
+      if (!control) {
+        return Response.json({ error: 'Control not found' }, { status: 404 });
+      }
 
-        const prompt = `You are a compliance expert specializing in ${control.framework} controls in Australia. 
+      // Skip if already has implementation details
+      if (control.implementation_overview && control.implementation_overview.length > 100) {
+        return Response.json({ status: 'skipped', reason: 'Already populated', control_id: control.control_id });
+      }
+
+      const prompt = `You are a compliance expert specializing in ${control.framework} controls in Australia. 
 
 Generate comprehensive, detailed, Australia-specific implementation guidance for this control:
 
@@ -57,55 +59,55 @@ Ensure all guidance:
 - Considers both large enterprises and mid-market organisations
 - Is specific to the ${control.framework} framework requirements`;
 
-        const response = await base44.integrations.Core.InvokeLLM({
-          prompt,
-          response_json_schema: {
-            type: 'object',
-            properties: {
-              implementation_type: { type: 'string', enum: ['manual', 'automated', 'hybrid'] },
-              implementation_overview: { type: 'string' },
-              implementation_steps: {
-                type: 'array',
-                items: {
-                  type: 'object',
-                  properties: {
-                    step_number: { type: 'integer' },
-                    title: { type: 'string' },
-                    description: { type: 'string' },
-                    responsible_role: { type: 'string' }
-                  }
+      const response = await base44.integrations.Core.InvokeLLM({
+        prompt,
+        response_json_schema: {
+          type: 'object',
+          properties: {
+            implementation_type: { type: 'string', enum: ['manual', 'automated', 'hybrid'] },
+            implementation_overview: { type: 'string' },
+            implementation_steps: {
+              type: 'array',
+              items: {
+                type: 'object',
+                properties: {
+                  step_number: { type: 'integer' },
+                  title: { type: 'string' },
+                  description: { type: 'string' },
+                  responsible_role: { type: 'string' }
                 }
-              },
-              automation_details: { type: 'string' },
-              manual_procedures: { type: 'string' },
-              best_practices: { type: 'array', items: { type: 'string' } },
-              common_pitfalls: { type: 'array', items: { type: 'string' } },
-              tools_and_systems: { type: 'array', items: { type: 'string' } },
-              testing_and_validation: { type: 'string' },
-              frequency: { type: 'string' }
+              }
             },
-            required: ['implementation_type', 'implementation_overview', 'implementation_steps', 'automation_details', 'manual_procedures', 'best_practices', 'common_pitfalls', 'tools_and_systems', 'testing_and_validation', 'frequency']
+            automation_details: { type: 'string' },
+            manual_procedures: { type: 'string' },
+            best_practices: { type: 'array', items: { type: 'string' } },
+            common_pitfalls: { type: 'array', items: { type: 'string' } },
+            tools_and_systems: { type: 'array', items: { type: 'string' } },
+            testing_and_validation: { type: 'string' },
+            frequency: { type: 'string' }
           }
-        });
+        }
+      });
 
-        // Update control with populated details
-        await base44.entities.Control.update(control.id, response);
-        updated.push({ id: control.id, control_id: control.control_id, status: 'success' });
-
-        // Small delay to avoid rate limiting
-        await new Promise(r => setTimeout(r, 500));
-      } catch (err) {
-        failed.push({ id: control.id, control_id: control.control_id, error: err.message });
-      }
+      await base44.entities.Control.update(controlId, response);
+      return Response.json({ status: 'success', control_id: control.control_id });
     }
 
-    return Response.json({
-      message: 'Control population complete',
-      total: controls.length,
-      updated: updated.length,
-      failed: failed.length,
-      results: { updated, failed }
-    });
+    // Otherwise, fetch first unpopulated control and return its ID
+    const controls = await base44.entities.Control.list('-created_date', 100);
+    const unpopulated = controls.find(c => !c.implementation_overview || c.implementation_overview.length < 100);
+
+    if (unpopulated) {
+      return Response.json({
+        status: 'next',
+        next_control_id: unpopulated.id,
+        control_id: unpopulated.control_id,
+        total: controls.length,
+        message: 'Call function with control_id to populate'
+      });
+    }
+
+    return Response.json({ status: 'complete', message: 'All controls populated' });
   } catch (error) {
     return Response.json({ error: error.message }, { status: 500 });
   }
