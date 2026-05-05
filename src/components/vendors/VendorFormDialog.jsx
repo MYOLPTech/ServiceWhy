@@ -75,7 +75,7 @@ export default function VendorFormDialog({ open, onOpenChange, vendor, onSave, s
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-4xl max-h-[90vh] flex flex-col">
+      <DialogContent className="max-w-4xl max-h-[90vh] flex flex-col fixed top-8 left-[50%] translate-x-[-50%] translate-y-0">
         <DialogHeader>
           <DialogTitle>{vendor ? 'Edit Vendor' : 'New Vendor'}</DialogTitle>
         </DialogHeader>

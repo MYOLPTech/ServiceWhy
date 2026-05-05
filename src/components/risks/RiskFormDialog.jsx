@@ -49,7 +49,7 @@ export default function RiskFormDialog({ open, onOpenChange, risk, onSave, savin
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-4xl max-h-[95vh] overflow-y-auto">
+      <DialogContent className="max-w-4xl max-h-[90vh] flex flex-col fixed top-8 left-[50%] translate-x-[-50%] translate-y-0">
         <DialogHeader>
           <DialogTitle>{risk ? 'Edit Risk' : 'Add Risk'}</DialogTitle>
         </DialogHeader>
