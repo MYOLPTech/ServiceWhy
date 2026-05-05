@@ -12,7 +12,7 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogTitle } from '@/components/ui/alert-dialog';
-import { Plus, Search, Trash2, Eye } from 'lucide-react';
+import { Plus, Search, Trash2, Eye, Pencil, Building2 } from 'lucide-react';
 
 export default function Vendors() {
   const [search, setSearch] = useState('');
@@ -92,13 +92,13 @@ export default function Vendors() {
   }
 
   return (
-    <div className="p-6">
-      <PageHeader 
-        title="Vendor Management" 
+    <div>
+      <PageHeader
+        title="Vendor Management"
         description="Manage vendors, assess risks, and track certifications"
         actions={
-          <Button onClick={() => { setEditingVendor(null); setDialogOpen(true); }}>
-            <Plus className="w-4 h-4" />New Vendor
+          <Button onClick={() => { setEditingVendor(null); setDialogOpen(true); }} className="gap-2">
+            <Plus className="w-4 h-4" /> Add Vendor
           </Button>
         }
       />
@@ -110,50 +110,43 @@ export default function Vendors() {
         { label: 'Under Review', value: vendors.filter(v => v.status === 'under_review' || v.due_diligence_status === 'in_progress').length, tone: 'blue' },
       ]} />
 
-      <div className="bg-white rounded-lg border p-4 mb-6 space-y-4">
-        <div className="flex gap-3">
-          <div className="flex-1 relative">
-            <Search className="absolute left-3 top-2.5 w-4 h-4 text-muted-foreground" />
-            <Input placeholder="Search by name or ID..." value={search} onChange={e => setSearch(e.target.value)} className="pl-10" />
-          </div>
+      <div className="flex flex-wrap items-center gap-3 mb-6">
+        <div className="relative flex-1 min-w-[200px] max-w-sm">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+          <Input placeholder="Search vendors..." value={search} onChange={e => setSearch(e.target.value)} className="pl-9" />
         </div>
-        <div className="flex gap-3">
-          <Select value={categoryFilter} onValueChange={setCategoryFilter}>
-            <SelectTrigger className="w-40">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Categories</SelectItem>
-              {['cloud_services','security','infrastructure','software','consulting','hardware','managed_services','audit_firms','telecommunications','other'].map(c => (
-                <SelectItem key={c} value={c}>{c.replace(/_/g, ' ')}</SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-          <Select value={statusFilter} onValueChange={setStatusFilter}>
-            <SelectTrigger className="w-40">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Status</SelectItem>
-              {['active','inactive','under_review','pending_approval','offboarding'].map(s => (
-                <SelectItem key={s} value={s}>{s.replace(/_/g, ' ')}</SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
+        <Select value={categoryFilter} onValueChange={setCategoryFilter}>
+          <SelectTrigger className="w-44"><SelectValue /></SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All Categories</SelectItem>
+            {['cloud_services','security','infrastructure','software','consulting','hardware','managed_services','audit_firms','telecommunications','other'].map(c => (
+              <SelectItem key={c} value={c} className="capitalize">{c.replace(/_/g, ' ')}</SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+        <Select value={statusFilter} onValueChange={setStatusFilter}>
+          <SelectTrigger className="w-40"><SelectValue /></SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All Status</SelectItem>
+            {['active','inactive','under_review','pending_approval','offboarding'].map(s => (
+              <SelectItem key={s} value={s} className="capitalize">{s.replace(/_/g, ' ')}</SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
       </div>
 
-      {filteredVendors.length === 0 ? (
-        <EmptyState 
-          title="No vendors found" 
-          description="Create your first vendor to get started" 
-          action={<Button onClick={() => { setEditingVendor(null); setDialogOpen(true); }}>Add Vendor</Button>}
-        />
-      ) : (
-        <div className="bg-white rounded-lg border overflow-hidden">
+      <div className="bg-card rounded-2xl border border-border/50 shadow-sm overflow-hidden">
+        {filteredVendors.length === 0 ? (
+          <EmptyState
+            icon={Building2}
+            title="No vendors found"
+            description="Create your first vendor to get started"
+            action={<Button variant="outline" onClick={() => { setEditingVendor(null); setDialogOpen(true); }}>Add Vendor</Button>}
+          />
+        ) : (
           <Table>
             <TableHeader>
-              <TableRow>
+              <TableRow className="bg-muted/30">
                 <TableHead className="w-24 cursor-pointer hover:bg-muted/50" onClick={() => handleSort('vendor_id')}>ID {sortBy === 'vendor_id' && (sortDir === 'asc' ? '↑' : '↓')}</TableHead>
                 <TableHead className="cursor-pointer hover:bg-muted/50" onClick={() => handleSort('name')}>Vendor {sortBy === 'name' && (sortDir === 'asc' ? '↑' : '↓')}</TableHead>
                 <TableHead className="cursor-pointer hover:bg-muted/50" onClick={() => handleSort('category')}>Category {sortBy === 'category' && (sortDir === 'asc' ? '↑' : '↓')}</TableHead>
@@ -161,37 +154,41 @@ export default function Vendors() {
                 <TableHead className="cursor-pointer hover:bg-muted/50" onClick={() => handleSort('risk_level')}>Risk Level {sortBy === 'risk_level' && (sortDir === 'asc' ? '↑' : '↓')}</TableHead>
                 <TableHead className="cursor-pointer hover:bg-muted/50" onClick={() => handleSort('compliance_status')}>Compliance {sortBy === 'compliance_status' && (sortDir === 'asc' ? '↑' : '↓')}</TableHead>
                 <TableHead className="cursor-pointer hover:bg-muted/50" onClick={() => handleSort('contract_status')}>Contract {sortBy === 'contract_status' && (sortDir === 'asc' ? '↑' : '↓')}</TableHead>
-                <TableHead className="text-right">Actions</TableHead>
+                <TableHead className="w-28" />
               </TableRow>
             </TableHeader>
             <TableBody>
               {filteredVendors.map(v => (
-                <TableRow key={v.id}>
+                <TableRow key={v.id} className="hover:bg-muted/20 transition-colors">
                   <TableCell className="font-mono text-xs text-muted-foreground">{v.vendor_id || '—'}</TableCell>
-                  <TableCell className="font-medium">
+                  <TableCell className="font-medium text-sm">
                     <div>{v.name}</div>
                     {v.primary_contact && <p className="text-xs text-muted-foreground mt-0.5">{v.primary_contact}</p>}
                   </TableCell>
-                  <TableCell className="text-sm capitalize">{v.category?.replace(/_/g, ' ')}</TableCell>
+                  <TableCell className="text-sm text-muted-foreground capitalize">{v.category?.replace(/_/g, ' ') || '—'}</TableCell>
                   <TableCell><StatusBadge status={v.status} /></TableCell>
                   <TableCell><StatusBadge status={v.risk_level} /></TableCell>
                   <TableCell><StatusBadge status={v.compliance_status} /></TableCell>
-                  <TableCell className="text-sm capitalize">{v.contract_status?.replace(/_/g, ' ')}</TableCell>
-                  <TableCell className="text-right space-x-2">
-                    <Button size="sm" variant="ghost" onClick={() => { setReportVendor(v); setReportOpen(true); }}>
-                      <Eye className="w-4 h-4" />
-                    </Button>
-                    <Button size="sm" variant="ghost" onClick={() => { setEditingVendor(v); setDialogOpen(true); }}>Edit</Button>
-                    <Button size="sm" variant="ghost" text-destructive onClick={() => setDeleteTarget(v)}>
-                      <Trash2 className="w-4 h-4" />
-                    </Button>
+                  <TableCell className="text-sm text-muted-foreground capitalize">{v.contract_status?.replace(/_/g, ' ') || '—'}</TableCell>
+                  <TableCell>
+                    <div className="flex items-center gap-1">
+                      <Button variant="ghost" size="icon" className="h-8 w-8 text-accent" title="View full report" onClick={() => { setReportVendor(v); setReportOpen(true); }}>
+                        <Eye className="w-3.5 h-3.5" />
+                      </Button>
+                      <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => { setEditingVendor(v); setDialogOpen(true); }}>
+                        <Pencil className="w-3.5 h-3.5" />
+                      </Button>
+                      <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive" onClick={() => setDeleteTarget(v)}>
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </Button>
+                    </div>
                   </TableCell>
                 </TableRow>
               ))}
             </TableBody>
           </Table>
-        </div>
-      )}
+        )}
+      </div>
 
       <VendorFormDialog open={dialogOpen} onOpenChange={setDialogOpen} vendor={editingVendor} onSave={handleSave} saving={createMutation.isPending || updateMutation.isPending} />
 
