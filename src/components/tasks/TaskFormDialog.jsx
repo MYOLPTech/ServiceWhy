@@ -39,7 +39,7 @@ export default function TaskFormDialog({ open, onOpenChange, task, controls, onS
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-4xl max-h-[95vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>{task ? 'Edit Task' : 'Add Task'}</DialogTitle>
         </DialogHeader>

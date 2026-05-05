@@ -4,6 +4,7 @@ import { base44 } from '@/api/base44Client';
 import { Plus, Search, Filter, Pencil, Trash2, Shield, BookOpen, X } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 import ControlGuidePanel from '../components/guides/ControlGuidePanel';
+import ControlDetailReport from '../components/controls/ControlDetailReport';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -24,6 +25,8 @@ export default function Controls() {
   const [editingControl, setEditingControl] = useState(null);
   const [deleteId, setDeleteId] = useState(null);
   const [guideControl, setGuideControl] = useState(null);
+  const [detailControl, setDetailControl] = useState(null);
+  const [detailOpen, setDetailOpen] = useState(false);
   const location = useLocation();
   const obligationFilter = useMemo(() => {
     const params = new URLSearchParams(location.search);
@@ -150,6 +153,7 @@ export default function Controls() {
                   <TableCell className="text-sm text-muted-foreground">{control.owner || '—'}</TableCell>
                   <TableCell>
                     <div className="flex items-center gap-1">
+                      <Button variant="ghost" size="icon" className="h-8 w-8 text-accent" title="View full report" onClick={() => { setDetailControl(control); setDetailOpen(true); }}><Shield className="w-3.5 h-3.5" /></Button>
                       <Button variant="ghost" size="icon" className="h-8 w-8 text-primary" title="Implementation guide" onClick={() => setGuideControl(control)}><BookOpen className="w-3.5 h-3.5" /></Button>
                       <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => { setEditingControl(control); setFormOpen(true); }}>
                         <Pencil className="w-3.5 h-3.5" />
@@ -167,6 +171,7 @@ export default function Controls() {
       </div>
 
       {guideControl && <ControlGuidePanel control={guideControl} onClose={() => setGuideControl(null)} />}
+      <ControlDetailReport control={detailControl} open={detailOpen} onOpenChange={setDetailOpen} />
       <ControlFormDialog
         open={formOpen}
         onOpenChange={setFormOpen}

@@ -55,7 +55,7 @@ export default function CmdbFormDialog({ open, onOpenChange, item, onSave, savin
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-3xl max-h-[90vh] flex flex-col">
+      <DialogContent className="max-w-6xl max-h-[95vh] flex flex-col">
         <DialogHeader>
           <DialogTitle>{item ? 'Edit CMDB Item' : 'New CMDB Item'}</DialogTitle>
         </DialogHeader>

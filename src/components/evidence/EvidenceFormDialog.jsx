@@ -37,7 +37,7 @@ export default function EvidenceFormDialog({ open, onOpenChange, evidence, contr
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-4xl max-h-[95vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>{evidence ? 'Edit Evidence' : 'Upload Evidence'}</DialogTitle>
         </DialogHeader>
