@@ -70,6 +70,13 @@
       },
       "description": "IDs of linked Control records"
     },
+    "linked_policy_ids": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "IDs of linked Policy records"
+    },
     "linked_task_ids": {
       "type": "array",
       "items": {
