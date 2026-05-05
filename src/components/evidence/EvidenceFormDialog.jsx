@@ -22,10 +22,15 @@ export default function EvidenceFormDialog({ open, onOpenChange, evidence, contr
   const [uploading, setUploading] = useState(false);
 
   useEffect(() => {
+    if (!open) return;
     if (evidence) {
       setForm({ ...emptyEvidence, ...evidence });
     } else {
-      setForm(emptyEvidence);
+      base44.entities.Evidence.list().then(records => {
+        const nums = records.map(r => parseInt((r.evidence_id || '').replace('EVD-', ''), 10)).filter(n => !isNaN(n));
+        const next = nums.length > 0 ? Math.max(...nums) + 1 : 1;
+        setForm({ ...emptyEvidence, evidence_id: `EVD-${String(next).padStart(3, '0')}` });
+      });
     }
   }, [evidence, open]);
 
@@ -76,7 +81,7 @@ export default function EvidenceFormDialog({ open, onOpenChange, evidence, contr
           <div className="grid grid-cols-2 gap-4">
             <div>
               <Label>Evidence ID</Label>
-              <Input value={form.evidence_id} onChange={e => setForm({...form, evidence_id: e.target.value})} placeholder="Auto-generated" disabled />
+              <Input value={form.evidence_id || ''} readOnly className="bg-muted text-muted-foreground cursor-not-allowed font-mono text-sm" />
             </div>
             <div>
               <Label>Status</Label>
