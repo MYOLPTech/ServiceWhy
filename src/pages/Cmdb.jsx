@@ -10,6 +10,7 @@ import { Badge } from '@/components/ui/badge';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import PageHeader from '../components/shared/PageHeader';
 import EmptyState from '../components/shared/EmptyState';
+import SummaryStats from '../components/shared/SummaryStats';
 import CmdbFormDialog from '../components/cmdb/CmdbFormDialog';
 
 const CRITICALITY_STYLES = {
@@ -113,20 +114,12 @@ export default function Cmdb() {
         }
       />
 
-      {/* Stats */}
-      <div className="grid grid-cols-4 gap-4 mb-6">
-        {[
-          { label: 'Total Assets', value: items.length, color: 'text-foreground' },
-          { label: 'Active', value: items.filter(i => i.status === 'active').length, color: 'text-emerald-600' },
-          { label: 'Critical', value: items.filter(i => i.criticality === 'critical').length, color: 'text-red-600' },
-          { label: 'Under Review', value: items.filter(i => i.status === 'under_review').length, color: 'text-blue-600' },
-        ].map(s => (
-          <div key={s.label} className="bg-card border border-border/50 rounded-xl p-4">
-            <p className="text-xs text-muted-foreground">{s.label}</p>
-            <p className={`text-2xl font-bold mt-1 ${s.color}`}>{s.value}</p>
-          </div>
-        ))}
-      </div>
+      <SummaryStats stats={[
+        { label: 'Total Assets', value: items.length },
+        { label: 'Active', value: items.filter(i => i.status === 'active').length, tone: 'green' },
+        { label: 'Critical', value: items.filter(i => i.criticality === 'critical').length, tone: 'red' },
+        { label: 'Under Review', value: items.filter(i => i.status === 'under_review').length, tone: 'blue' },
+      ]} />
 
       {/* Filters */}
       <div className="flex flex-wrap items-center gap-3 mb-6">

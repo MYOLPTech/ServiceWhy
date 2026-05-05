@@ -14,6 +14,7 @@ import PageHeader from '../components/shared/PageHeader';
 import StatusBadge from '../components/shared/StatusBadge';
 import FrameworkBadge from '../components/shared/FrameworkBadge';
 import EmptyState from '../components/shared/EmptyState';
+import SummaryStats from '../components/shared/SummaryStats';
 import ControlFormDialog from '../components/controls/ControlFormDialog';
 
 export default function Controls() {
@@ -106,6 +107,13 @@ export default function Controls() {
           </Button>
         }
       />
+
+      <SummaryStats stats={[
+        { label: 'Total Controls', value: controls.length },
+        { label: 'In Progress', value: controls.filter(c => c.status === 'in_progress').length, tone: 'blue' },
+        { label: 'Not Started', value: controls.filter(c => c.status === 'not_started').length, tone: 'red' },
+        { label: 'Implemented / Verified', value: controls.filter(c => ['implemented', 'verified'].includes(c.status)).length, tone: 'green' },
+      ]} />
 
       {/* Filters */}
       <div className="flex flex-wrap items-center gap-3 mb-6">

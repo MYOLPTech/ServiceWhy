@@ -8,6 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import PageHeader from '../components/shared/PageHeader';
+import SummaryStats from '../components/shared/SummaryStats';
 
 const FRAMEWORK_STYLES = {
   SOC2:     { bg: 'bg-blue-100 text-blue-800 border-blue-200',     dot: 'bg-blue-500',   label: 'SOC 2' },
@@ -210,20 +211,12 @@ export default function ObligationRegister() {
         description="Track compliance obligations across SOC 2, ISO 27001, ASAE 3150, and CDR accreditation — linked to risks, controls, and tasks."
       />
 
-      {/* Summary cards */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-        {[
-          { label: 'Total Obligations', value: obligations.length, color: 'text-foreground', bg: 'bg-card' },
-          { label: 'Compliant', value: totalCompliant, color: 'text-green-700', bg: 'bg-green-50' },
-          { label: 'In Progress', value: totalInProgress, color: 'text-yellow-700', bg: 'bg-yellow-50' },
-          { label: 'Non-Compliant', value: totalNonCompliant, color: 'text-red-700', bg: 'bg-red-50' },
-        ].map(card => (
-          <div key={card.label} className={`${card.bg} rounded-xl border border-border/50 p-4 shadow-sm`}>
-            <div className={`text-2xl font-bold ${card.color}`}>{card.value}</div>
-            <div className="text-xs text-muted-foreground mt-1">{card.label}</div>
-          </div>
-        ))}
-      </div>
+      <SummaryStats stats={[
+        { label: 'Total Obligations', value: obligations.length },
+        { label: 'In Progress', value: totalInProgress, tone: 'amber' },
+        { label: 'Non-Compliant', value: totalNonCompliant, tone: 'red' },
+        { label: 'Compliant', value: totalCompliant, tone: 'green' },
+      ]} />
 
       {/* Filters */}
       <div className="flex flex-wrap items-center gap-3 mb-6">

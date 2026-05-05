@@ -10,6 +10,7 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import PageHeader from '../components/shared/PageHeader';
 import StatusBadge from '../components/shared/StatusBadge';
 import EmptyState from '../components/shared/EmptyState';
+import SummaryStats from '../components/shared/SummaryStats';
 import IncidentFormDialog from '../components/incidents/IncidentFormDialog';
 import { format } from 'date-fns';
 
@@ -83,24 +84,12 @@ export default function Incidents() {
         actions={<Button onClick={() => { setEditing(null); setFormOpen(true); }} className="gap-2"><Plus className="w-4 h-4" /> Report Incident</Button>}
       />
 
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-        <div className="bg-card rounded-xl border border-border/50 p-4 shadow-sm">
-          <div className="text-2xl font-bold">{incidents.length}</div>
-          <div className="text-xs text-muted-foreground mt-1">Total Incidents</div>
-        </div>
-        <div className="bg-blue-50 rounded-xl border border-border/50 p-4 shadow-sm">
-          <div className="text-2xl font-bold text-blue-700">{counts.open}</div>
-          <div className="text-xs text-muted-foreground mt-1">Open</div>
-        </div>
-        <div className="bg-red-50 rounded-xl border border-border/50 p-4 shadow-sm">
-          <div className="text-2xl font-bold text-red-700">{counts.critical}</div>
-          <div className="text-xs text-muted-foreground mt-1">Critical (Open)</div>
-        </div>
-        <div className="bg-green-50 rounded-xl border border-border/50 p-4 shadow-sm">
-          <div className="text-2xl font-bold text-green-700">{counts.resolved}</div>
-          <div className="text-xs text-muted-foreground mt-1">Resolved / Closed</div>
-        </div>
-      </div>
+      <SummaryStats stats={[
+        { label: 'Total Incidents', value: incidents.length },
+        { label: 'Open', value: counts.open, tone: 'blue' },
+        { label: 'Critical (Open)', value: counts.critical, tone: 'red' },
+        { label: 'Resolved / Closed', value: counts.resolved, tone: 'green' },
+      ]} />
 
       <div className="flex flex-wrap items-center gap-3 mb-6">
         <div className="relative flex-1 min-w-[200px] max-w-sm">

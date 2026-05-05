@@ -10,6 +10,7 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import PageHeader from '../components/shared/PageHeader';
 import StatusBadge from '../components/shared/StatusBadge';
 import EmptyState from '../components/shared/EmptyState';
+import SummaryStats from '../components/shared/SummaryStats';
 import EvidenceFormDialog from '../components/evidence/EvidenceFormDialog';
 import { format } from 'date-fns';
 
@@ -100,6 +101,13 @@ export default function Evidence() {
           </Button>
         }
       />
+
+      <SummaryStats stats={[
+        { label: 'Total Evidence', value: evidence.length },
+        { label: 'Pending Review', value: evidence.filter(e => e.status === 'pending_review').length, tone: 'amber' },
+        { label: 'Expired / Rejected', value: evidence.filter(e => ['expired', 'rejected'].includes(e.status)).length, tone: 'red' },
+        { label: 'Approved', value: evidence.filter(e => e.status === 'approved').length, tone: 'green' },
+      ]} />
 
       <div className="flex flex-wrap items-center gap-3 mb-6">
         <div className="relative flex-1 min-w-[200px] max-w-sm">

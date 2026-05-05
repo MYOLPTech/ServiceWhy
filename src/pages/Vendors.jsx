@@ -3,6 +3,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import PageHeader from '@/components/shared/PageHeader';
 import EmptyState from '@/components/shared/EmptyState';
+import SummaryStats from '@/components/shared/SummaryStats';
 import StatusBadge from '@/components/shared/StatusBadge';
 import VendorFormDialog from '@/components/vendors/VendorFormDialog';
 import VendorDetailReport from '@/components/vendors/VendorDetailReport';
@@ -101,6 +102,13 @@ export default function Vendors() {
           </Button>
         }
       />
+
+      <SummaryStats stats={[
+        { label: 'Total Vendors', value: vendors.length },
+        { label: 'Active', value: vendors.filter(v => v.status === 'active').length, tone: 'green' },
+        { label: 'High / Critical Risk', value: vendors.filter(v => ['critical', 'high'].includes(v.risk_level)).length, tone: 'red' },
+        { label: 'Under Review', value: vendors.filter(v => v.status === 'under_review' || v.due_diligence_status === 'in_progress').length, tone: 'blue' },
+      ]} />
 
       <div className="bg-white rounded-lg border p-4 mb-6 space-y-4">
         <div className="flex gap-3">

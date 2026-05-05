@@ -13,6 +13,7 @@ import PageHeader from '../components/shared/PageHeader';
 import StatusBadge from '../components/shared/StatusBadge';
 import FrameworkBadge from '../components/shared/FrameworkBadge';
 import EmptyState from '../components/shared/EmptyState';
+import SummaryStats from '../components/shared/SummaryStats';
 import TaskFormDialog from '../components/tasks/TaskFormDialog';
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
@@ -104,6 +105,14 @@ export default function Tasks() {
         description="Track remediation, implementation, and audit preparation tasks"
         actions={<Button onClick={() => { setEditing(null); setFormOpen(true); }} className="gap-2"><Plus className="w-4 h-4" /> Add Task</Button>}
       />
+
+      <SummaryStats stats={[
+        { label: 'Total Tasks', value: tasks.length },
+        { label: 'In Progress', value: tasks.filter(t => t.status === 'in_progress').length, tone: 'blue' },
+        { label: 'Overdue', value: tasks.filter(isOverdue).length, tone: 'red' },
+        { label: 'Completed', value: tasks.filter(t => t.status === 'completed').length, tone: 'green' },
+      ]} />
+
       <div className="flex flex-wrap items-center gap-3 mb-6">
         <div className="relative flex-1 min-w-[200px] max-w-sm">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />

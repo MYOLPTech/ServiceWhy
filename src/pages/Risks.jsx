@@ -11,6 +11,7 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import PageHeader from '../components/shared/PageHeader';
 import StatusBadge from '../components/shared/StatusBadge';
 import EmptyState from '../components/shared/EmptyState';
+import SummaryStats from '../components/shared/SummaryStats';
 import RiskFormDialog from '../components/risks/RiskFormDialog';
 import { cn } from '@/lib/utils';
 import { Link, useLocation } from 'react-router-dom';
@@ -106,6 +107,13 @@ export default function Risks() {
           </Button>
         }
       />
+
+      <SummaryStats stats={[
+        { label: 'Total Risks', value: risks.length },
+        { label: 'Open', value: risks.filter(r => r.status === 'open').length, tone: 'blue' },
+        { label: 'High Score (≥15)', value: risks.filter(r => (r.risk_score || r.likelihood * r.impact) >= 15).length, tone: 'red' },
+        { label: 'Closed / Accepted', value: risks.filter(r => ['closed', 'accepted'].includes(r.status)).length, tone: 'green' },
+      ]} />
 
       <div className="flex flex-wrap items-center gap-3 mb-6">
         <div className="relative flex-1 min-w-[200px] max-w-sm">

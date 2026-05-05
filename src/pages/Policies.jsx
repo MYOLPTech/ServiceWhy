@@ -13,6 +13,7 @@ import PageHeader from '../components/shared/PageHeader';
 import StatusBadge from '../components/shared/StatusBadge';
 import FrameworkBadge from '../components/shared/FrameworkBadge';
 import EmptyState from '../components/shared/EmptyState';
+import SummaryStats from '../components/shared/SummaryStats';
 import PolicyFormDialog from '../components/policies/PolicyFormDialog';
 import { format } from 'date-fns';
 
@@ -82,6 +83,14 @@ export default function Policies() {
         description="Manage your compliance documentation"
         actions={<Button onClick={() => { setEditing(null); setFormOpen(true); }} className="gap-2"><Plus className="w-4 h-4" /> Add Policy</Button>}
       />
+
+      <SummaryStats stats={[
+        { label: 'Total Policies', value: policies.filter(p => !p.is_deleted).length },
+        { label: 'Draft / In Review', value: policies.filter(p => !p.is_deleted && ['draft', 'in_review'].includes(p.status)).length, tone: 'amber' },
+        { label: 'Retired', value: policies.filter(p => !p.is_deleted && p.status === 'retired').length, tone: 'red' },
+        { label: 'Approved / Published', value: policies.filter(p => !p.is_deleted && ['approved', 'published'].includes(p.status)).length, tone: 'green' },
+      ]} />
+
       <div className="flex flex-wrap items-center gap-3 mb-6">
          <div className="relative flex-1 min-w-[200px] max-w-sm">
            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
