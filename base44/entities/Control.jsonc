@@ -53,13 +53,84 @@
       "type": "string",
       "description": "Person responsible for this control"
     },
+    "implementation_type": {
+      "type": "string",
+      "enum": [
+        "manual",
+        "automated",
+        "hybrid"
+      ],
+      "description": "Whether the control is manual, automated, or hybrid"
+    },
+    "implementation_overview": {
+      "type": "string",
+      "description": "High-level overview of how to implement this control"
+    },
+    "implementation_steps": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "step_number": {
+            "type": "integer"
+          },
+          "title": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "responsible_role": {
+            "type": "string"
+          }
+        }
+      },
+      "description": "Detailed step-by-step implementation guidance"
+    },
+    "automation_details": {
+      "type": "string",
+      "description": "If automated, detailed description of automation tools, scripts, or systems"
+    },
+    "manual_procedures": {
+      "type": "string",
+      "description": "If manual or hybrid, detailed procedures and workflows"
+    },
+    "best_practices": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Industry best practices for implementing this control"
+    },
+    "common_pitfalls": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Common mistakes and pitfalls to avoid"
+    },
+    "tools_and_systems": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Recommended tools, platforms, or systems for implementation"
+    },
+    "testing_and_validation": {
+      "type": "string",
+      "description": "How to test and validate the control is working as intended"
+    },
+    "frequency": {
+      "type": "string",
+      "description": "How often the control should be executed or reviewed (e.g., daily, weekly, monthly, annually)"
+    },
     "implementation_notes": {
       "type": "string",
-      "description": "Notes on how this control is implemented"
+      "description": "Notes on how this control is implemented in your organization"
     },
     "evidence_required": {
       "type": "string",
-      "description": "Description of evidence needed"
+      "description": "Description of evidence needed to demonstrate compliance"
     },
     "target_date": {
       "type": "string",

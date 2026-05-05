@@ -410,6 +410,7 @@ function Section({ section }) {
 }
 
 export default function ControlGuidePanel({ control, onClose }) {
+  const [activeTab, setActiveTab] = useState('guide');
   const [activeFramework, setActiveFramework] = useState(control?.framework || 'generic');
   const sections = FRAMEWORK_SECTIONS[activeFramework] || GENERIC_SECTIONS;
   const frameworks = ['SOC2', 'ASAE3150', 'ISO27001'];
@@ -433,26 +434,155 @@ export default function ControlGuidePanel({ control, onClose }) {
           <Button variant="ghost" size="icon" onClick={onClose}><X className="w-4 h-4" /></Button>
         </div>
 
-        {/* Framework tabs */}
+        {/* Tabs */}
         <div className="flex gap-1 px-6 pt-3 border-b border-border">
-          {frameworks.map(fw => (
+          <button
+            onClick={() => setActiveTab('guide')}
+            className={`px-3 py-2 text-xs font-semibold rounded-t-lg border-b-2 transition-colors ${
+              activeTab === 'guide' ? 'border-primary text-primary' : 'border-transparent text-muted-foreground hover:text-foreground'
+            }`}
+          >
+            Framework Guide
+          </button>
+          {control?.implementation_overview && (
             <button
-              key={fw}
-              onClick={() => setActiveFramework(fw)}
+              onClick={() => setActiveTab('implementation')}
               className={`px-3 py-2 text-xs font-semibold rounded-t-lg border-b-2 transition-colors ${
-                activeFramework === fw ? 'border-primary text-primary' : 'border-transparent text-muted-foreground hover:text-foreground'
+                activeTab === 'implementation' ? 'border-primary text-primary' : 'border-transparent text-muted-foreground hover:text-foreground'
               }`}
             >
-              {frameworkLabel[fw]}
+              Implementation Details
             </button>
-          ))}
+          )}
         </div>
 
+        {/* Framework sub-tabs (only show in guide tab) */}
+        {activeTab === 'guide' && (
+          <div className="flex gap-1 px-6 pt-2 pb-2 border-b border-border/40">
+            {frameworks.map(fw => (
+              <button
+                key={fw}
+                onClick={() => setActiveFramework(fw)}
+                className={`px-2.5 py-1.5 text-xs font-medium rounded border transition-colors ${
+                  activeFramework === fw ? 'bg-primary/10 text-primary border-primary/30' : 'border-transparent text-muted-foreground hover:text-foreground'
+                }`}
+              >
+                {frameworkLabel[fw]}
+              </button>
+            ))}
+          </div>
+        )}
+
         <div className="flex-1 overflow-y-auto p-6 space-y-3">
-          <p className="text-xs text-muted-foreground bg-amber-50 border border-amber-200 rounded-lg px-3 py-2">
-            Guidance reflects Australian regulatory context including the <strong>Privacy Act 1988</strong>, <strong>APRA CPS 234</strong>, <strong>ASD Essential Eight</strong>, <strong>JAS-ANZ accreditation</strong>, and <strong>AUASB assurance standards</strong>.
-          </p>
-          {sections.map((s, i) => <Section key={`${activeFramework}-${i}`} section={s} />)}
+          {activeTab === 'guide' ? (
+            <>
+              <p className="text-xs text-muted-foreground bg-amber-50 border border-amber-200 rounded-lg px-3 py-2">
+                Guidance reflects Australian regulatory context including the <strong>Privacy Act 1988</strong>, <strong>APRA CPS 234</strong>, <strong>ASD Essential Eight</strong>, <strong>JAS-ANZ accreditation</strong>, and <strong>AUASB assurance standards</strong>.
+              </p>
+              {sections.map((s, i) => <Section key={`${activeFramework}-${i}`} section={s} />)}
+            </>
+          ) : (
+            <div className="space-y-4">
+              {/* Implementation Type */}
+              {control?.implementation_type && (
+                <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+                  <h4 className="text-sm font-semibold text-blue-900 mb-1">Implementation Type</h4>
+                  <p className="text-sm text-blue-800 capitalize">{control.implementation_type}</p>
+                </div>
+              )}
+
+              {/* Implementation Overview */}
+              {control?.implementation_overview && (
+                <div>
+                  <h4 className="text-sm font-semibold text-foreground mb-2">Overview</h4>
+                  <p className="text-sm text-muted-foreground whitespace-pre-wrap">{control.implementation_overview}</p>
+                </div>
+              )}
+
+              {/* Implementation Steps */}
+              {control?.implementation_steps && control.implementation_steps.length > 0 && (
+                <div>
+                  <h4 className="text-sm font-semibold text-foreground mb-2">Implementation Steps</h4>
+                  <div className="space-y-2">
+                    {control.implementation_steps.map((step, i) => (
+                      <div key={i} className="border border-border/60 rounded-lg p-3 bg-muted/30">
+                        <p className="text-xs font-bold text-foreground mb-1">Step {step.step_number}: {step.title}</p>
+                        <p className="text-xs text-muted-foreground mb-1">{step.description}</p>
+                        {step.responsible_role && <p className="text-xs text-primary font-medium">Responsible: {step.responsible_role}</p>}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Automation Details */}
+              {control?.automation_details && (
+                <div className="bg-green-50 border border-green-200 rounded-lg p-3">
+                  <h4 className="text-sm font-semibold text-green-900 mb-2">Automation Details</h4>
+                  <p className="text-sm text-green-800 whitespace-pre-wrap">{control.automation_details}</p>
+                </div>
+              )}
+
+              {/* Manual Procedures */}
+              {control?.manual_procedures && (
+                <div className="bg-orange-50 border border-orange-200 rounded-lg p-3">
+                  <h4 className="text-sm font-semibold text-orange-900 mb-2">Manual Procedures</h4>
+                  <p className="text-sm text-orange-800 whitespace-pre-wrap">{control.manual_procedures}</p>
+                </div>
+              )}
+
+              {/* Best Practices */}
+              {control?.best_practices && control.best_practices.length > 0 && (
+                <div>
+                  <h4 className="text-sm font-semibold text-foreground mb-2">Best Practices</h4>
+                  <ul className="space-y-1">
+                    {control.best_practices.map((practice, i) => (
+                      <li key={i} className="text-sm text-muted-foreground pl-3 border-l-2 border-primary/30">• {practice}</li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+
+              {/* Common Pitfalls */}
+              {control?.common_pitfalls && control.common_pitfalls.length > 0 && (
+                <div className="bg-red-50 border border-red-200 rounded-lg p-3">
+                  <h4 className="text-sm font-semibold text-red-900 mb-2">Common Pitfalls to Avoid</h4>
+                  <ul className="space-y-1">
+                    {control.common_pitfalls.map((pitfall, i) => (
+                      <li key={i} className="text-sm text-red-800 pl-3">⚠️ {pitfall}</li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+
+              {/* Tools & Systems */}
+              {control?.tools_and_systems && control.tools_and_systems.length > 0 && (
+                <div>
+                  <h4 className="text-sm font-semibold text-foreground mb-2">Recommended Tools & Systems</h4>
+                  <ul className="space-y-1">
+                    {control.tools_and_systems.map((tool, i) => (
+                      <li key={i} className="text-sm text-muted-foreground pl-3 border-l-2 border-accent/30">• {tool}</li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+
+              {/* Testing & Validation */}
+              {control?.testing_and_validation && (
+                <div className="border border-border/60 rounded-lg p-3 bg-muted/10">
+                  <h4 className="text-sm font-semibold text-foreground mb-2">Testing & Validation</h4>
+                  <p className="text-sm text-muted-foreground whitespace-pre-wrap">{control.testing_and_validation}</p>
+                </div>
+              )}
+
+              {/* Frequency */}
+              {control?.frequency && (
+                <div className="text-sm text-muted-foreground bg-muted/30 rounded-lg p-3">
+                  <span className="font-semibold text-foreground">Frequency:</span> {control.frequency}
+                </div>
+              )}
+            </div>
+          )}
         </div>
       </div>
     </div>
