@@ -45,13 +45,13 @@ export default function Tasks() {
     queryKey: ['tasks'],
     queryFn: () => base44.entities.Task.list('-created_date'),
   });
-  const tasks = allTasks.filter(t => !t.is_deleted);
+  const tasks = allTasks;
 
   const { data: allControls = [] } = useQuery({
     queryKey: ['controls'],
     queryFn: () => base44.entities.Control.list(),
   });
-  const controls = allControls.filter(c => !c.is_deleted);
+  const controls = allControls;
 
   const createMutation = useMutation({
     mutationFn: (data) => base44.entities.Task.create(data),
@@ -62,7 +62,7 @@ export default function Tasks() {
     onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['tasks'] }); setFormOpen(false); setEditing(null); },
   });
   const deleteMutation = useMutation({
-    mutationFn: (id) => base44.entities.Task.update(id, { is_deleted: true, deleted_date: new Date().toISOString() }),
+    mutationFn: (id) => base44.entities.Task.delete(id),
     onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['tasks'] }); setDeleteId(null); },
   });
 

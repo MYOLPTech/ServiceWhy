@@ -46,7 +46,7 @@ export default function Controls() {
     queryKey: ['controls'],
     queryFn: () => base44.entities.Control.list('-created_date'),
   });
-  const controls = allControls.filter(c => !c.is_deleted);
+  const controls = allControls;
 
   const createMutation = useMutation({
     mutationFn: (data) => base44.entities.Control.create(data),
@@ -59,7 +59,7 @@ export default function Controls() {
   });
 
   const deleteMutation = useMutation({
-    mutationFn: (id) => base44.entities.Control.update(id, { is_deleted: true, deleted_date: new Date().toISOString() }),
+    mutationFn: (id) => base44.entities.Control.delete(id),
     onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['controls'] }); setDeleteId(null); },
   });
 

@@ -32,13 +32,13 @@ export default function Evidence() {
     queryKey: ['evidence'],
     queryFn: () => base44.entities.Evidence.list('-created_date'),
   });
-  const evidence = allEvidence.filter(e => !e.is_deleted);
+  const evidence = allEvidence;
 
   const { data: allControls = [] } = useQuery({
     queryKey: ['controls'],
     queryFn: () => base44.entities.Control.list(),
   });
-  const controls = allControls.filter(c => !c.is_deleted);
+  const controls = allControls;
 
   const createMutation = useMutation({
     mutationFn: (data) => base44.entities.Evidence.create(data),
@@ -51,7 +51,7 @@ export default function Evidence() {
   });
 
   const deleteMutation = useMutation({
-    mutationFn: (id) => base44.entities.Evidence.update(id, { is_deleted: true, deleted_date: new Date().toISOString() }),
+    mutationFn: (id) => base44.entities.Evidence.delete(id),
     onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['evidence'] }); setDeleteId(null); },
   });
 

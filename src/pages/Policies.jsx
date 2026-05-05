@@ -20,7 +20,6 @@ export default function Policies() {
   const queryClient = useQueryClient();
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
-  const [showDeleted, setShowDeleted] = useState(false);
   const [sortBy, setSortBy] = useState('review_date');
   const [sortDir, setSortDir] = useState('desc');
   const [formOpen, setFormOpen] = useState(false);
@@ -49,7 +48,7 @@ export default function Policies() {
     onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['policies'] }); setFormOpen(false); setEditing(null); },
   });
   const deleteMutation = useMutation({
-    mutationFn: (id) => base44.entities.Policy.update(id, { is_deleted: true, deleted_date: new Date().toISOString() }),
+    mutationFn: (id) => base44.entities.Policy.delete(id),
     onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['policies'] }); setDeleteId(null); },
   });
 
@@ -61,8 +60,7 @@ export default function Policies() {
   const filtered = policies.filter(p => {
     const matchesSearch = !search || p.title?.toLowerCase().includes(search.toLowerCase());
     const matchesStatus = statusFilter === 'all' || p.status === statusFilter;
-    const matchesDeleted = showDeleted || !p.is_deleted;
-    return matchesSearch && matchesStatus && matchesDeleted;
+    return matchesSearch && matchesStatus;
   }).sort((a, b) => {
     let aVal = a[sortBy] || '';
     let bVal = b[sortBy] || '';
@@ -98,10 +96,7 @@ export default function Policies() {
              <SelectItem value="retired">Retired</SelectItem>
            </SelectContent>
          </Select>
-         <Button variant={showDeleted ? 'default' : 'outline'} onClick={() => setShowDeleted(!showDeleted)} className="gap-2">
-           {showDeleted ? 'Hiding' : 'Show'} Deleted
-         </Button>
-       </div>
+         </div>
 
       <div className="bg-card rounded-2xl border border-border/50 shadow-sm overflow-hidden">
         {filtered.length === 0 ? (
