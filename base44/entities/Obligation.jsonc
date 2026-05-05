@@ -58,19 +58,19 @@
       "type": "string",
       "format": "date"
     },
-    "linked_risk_ids": {
-      "type": "array",
-      "items": {
-        "type": "string"
-      },
-      "description": "IDs of linked Risk records"
-    },
     "linked_control_ids": {
       "type": "array",
       "items": {
         "type": "string"
       },
       "description": "IDs of linked Control records"
+    },
+    "linked_risk_ids": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "IDs of linked Risk records"
     },
     "linked_policy_ids": {
       "type": "array",
@@ -85,6 +85,27 @@
         "type": "string"
       },
       "description": "IDs of linked Task records"
+    },
+    "linked_evidence_ids": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "IDs of linked Evidence records"
+    },
+    "linked_cmdb_ids": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "IDs of linked CMDB Item records"
+    },
+    "linked_vendor_ids": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "IDs of linked Vendor records"
     },
     "source_reference": {
       "type": "string",

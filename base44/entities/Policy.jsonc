@@ -77,6 +77,55 @@
       "type": "string",
       "format": "date"
     },
+    "linked_control_ids": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "IDs of linked Control records"
+    },
+    "linked_risk_ids": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "IDs of linked Risk records"
+    },
+    "linked_task_ids": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "IDs of linked Task records"
+    },
+    "linked_evidence_ids": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "IDs of linked Evidence records"
+    },
+    "linked_cmdb_ids": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "IDs of linked CMDB Item records"
+    },
+    "linked_vendor_ids": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "IDs of linked Vendor records"
+    },
+    "linked_obligation_ids": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "IDs of linked Obligation records"
+    },
     "is_deleted": {
       "type": "boolean",
       "default": false,
