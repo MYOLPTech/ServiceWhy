@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { base44 } from '@/api/base44Client';
 import LinkedRecords from '../shared/LinkedRecords';
 
@@ -64,10 +64,12 @@ export default function TaskFormDialog({ open, onOpenChange, task, controls, onS
         <DialogHeader>
           <DialogTitle>{task ? 'Edit Task' : 'Add Task'}</DialogTitle>
         </DialogHeader>
-        <TabsList className="mb-4 w-fit">
-          <TabsTrigger value="details" onClick={() => setTab('details')}>Details</TabsTrigger>
-          <TabsTrigger value="links" onClick={() => setTab('links')}>Linked Records</TabsTrigger>
-        </TabsList>
+        <Tabs value={tab} onValueChange={setTab} className="w-full">
+          <TabsList className="mb-4 w-fit">
+            <TabsTrigger value="details">Details</TabsTrigger>
+            <TabsTrigger value="links">Linked Records</TabsTrigger>
+          </TabsList>
+        </Tabs>
         <form onSubmit={handleSubmit} className={tab === 'details' ? 'space-y-4' : 'hidden'}>
           <div className="grid grid-cols-3 gap-4">
             <div>
