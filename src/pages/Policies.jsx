@@ -3,6 +3,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { Plus, Search, FileText, Pencil, Trash2, ExternalLink, Eye } from 'lucide-react';
 import PolicyContentViewer from '../components/policies/PolicyContentViewer';
+import PolicyDetailReport from '../components/policies/PolicyDetailReport';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -23,6 +24,8 @@ export default function Policies() {
   const [editing, setEditing] = useState(null);
   const [deleteId, setDeleteId] = useState(null);
   const [viewingPolicy, setViewingPolicy] = useState(null);
+  const [detailOpen, setDetailOpen] = useState(false);
+  const [selectedPolicy, setSelectedPolicy] = useState(null);
 
   const { data: policies = [] } = useQuery({
     queryKey: ['policies'],
@@ -111,7 +114,7 @@ export default function Policies() {
                   <TableCell className="text-sm text-muted-foreground">{p.review_date ? format(new Date(p.review_date), 'MMM d, yyyy') : '—'}</TableCell>
                   <TableCell>
                     <div className="flex items-center gap-1">
-                      <Button variant="ghost" size="icon" className="h-8 w-8" title="View policy document" onClick={() => setViewingPolicy(p)}><Eye className="w-3.5 h-3.5" /></Button>
+                      <Button variant="ghost" size="icon" className="h-8 w-8" title="View full report" onClick={() => { setSelectedPolicy(p); setDetailOpen(true); }}><Eye className="w-3.5 h-3.5" /></Button>
                       {p.file_url && <a href={p.file_url} target="_blank" rel="noopener noreferrer"><Button variant="ghost" size="icon" className="h-8 w-8"><ExternalLink className="w-3.5 h-3.5" /></Button></a>}
                       <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => { setEditing(p); setFormOpen(true); }}><Pencil className="w-3.5 h-3.5" /></Button>
                       <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive" onClick={() => setDeleteId(p.id)}><Trash2 className="w-3.5 h-3.5" /></Button>
@@ -126,6 +129,7 @@ export default function Policies() {
 
       <PolicyFormDialog open={formOpen} onOpenChange={setFormOpen} policy={editing} onSave={handleSave} saving={createMutation.isPending || updateMutation.isPending} />
       {viewingPolicy && <PolicyContentViewer policy={viewingPolicy} onClose={() => setViewingPolicy(null)} />}
+      <PolicyDetailReport policy={selectedPolicy} open={detailOpen} onOpenChange={setDetailOpen} />
       <AlertDialog open={!!deleteId} onOpenChange={() => setDeleteId(null)}>
         <AlertDialogContent>
           <AlertDialogHeader><AlertDialogTitle>Delete Policy?</AlertDialogTitle><AlertDialogDescription>This action cannot be undone.</AlertDialogDescription></AlertDialogHeader>
