@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { Link } from 'react-router-dom';
 import { Search, Filter, ExternalLink, AlertTriangle, Shield, CheckSquare, ChevronDown, ChevronRight, Info } from 'lucide-react';
@@ -39,21 +39,27 @@ const PRIORITY_STYLES = {
   low:      'bg-slate-100 text-slate-600',
 };
 
-function LinkedItems({ ids = [], entityName, path, ItemIcon, color, obligationTitle }) {
+function LinkedItems({ ids = [], names = [], entityName, path, ItemIcon, color, obligationTitle }) {
   if (!ids || ids.length === 0) return <span className="text-muted-foreground text-xs">—</span>;
   const href = `${path}?ids=${ids.join(',')}&from=${encodeURIComponent(obligationTitle)}`;
+  const label = names.length > 0
+    ? (names.length === 1 ? names[0] : `${names[0]} +${names.length - 1} more`)
+    : `${ids.length} ${entityName.toLowerCase()}${ids.length !== 1 ? 's' : ''}`;
   return (
-    <Link to={href} title={`View ${ids.length} linked ${entityName.toLowerCase()} filtered by this obligation`}
-      className={`inline-flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-full border font-medium ${color} hover:opacity-80 transition-opacity`}>
-      <ItemIcon className="w-3 h-3" />
-      {ids.length} {entityName.toLowerCase()}{ids.length !== 1 ? 's' : ''}
+    <Link to={href} title={names.join(', ')}
+      className={`inline-flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-full border font-medium ${color} hover:opacity-80 transition-opacity max-w-[200px] truncate`}>
+      <ItemIcon className="w-3 h-3 flex-shrink-0" />
+      <span className="truncate">{label}</span>
     </Link>
   );
 }
 
-function ObligationRow({ obligation }) {
+function ObligationRow({ obligation, riskMap, controlMap, taskMap }) {
   const [expanded, setExpanded] = useState(false);
   const fw = FRAMEWORK_STYLES[obligation.framework] || FRAMEWORK_STYLES.SOC2;
+  const riskNames = (obligation.linked_risk_ids || []).map(id => riskMap[id]).filter(Boolean);
+  const controlNames = (obligation.linked_control_ids || []).map(id => controlMap[id]).filter(Boolean);
+  const taskNames = (obligation.linked_task_ids || []).map(id => taskMap[id]).filter(Boolean);
 
   return (
     <>
@@ -90,9 +96,9 @@ function ObligationRow({ obligation }) {
         <td className="px-2 py-3 text-xs text-muted-foreground font-mono">{obligation.source_reference || '—'}</td>
         <td className="px-2 py-3">
           <div className="flex flex-col gap-1">
-            <LinkedItems ids={obligation.linked_risk_ids} entityName="Risk" path="/risks" ItemIcon={AlertTriangle} color="border-red-200 text-red-700 bg-red-50" obligationTitle={obligation.title} />
-            <LinkedItems ids={obligation.linked_control_ids} entityName="Control" path="/controls" ItemIcon={Shield} color="border-blue-200 text-blue-700 bg-blue-50" obligationTitle={obligation.title} />
-            <LinkedItems ids={obligation.linked_task_ids} entityName="Task" path="/tasks" ItemIcon={CheckSquare} color="border-green-200 text-green-700 bg-green-50" obligationTitle={obligation.title} />
+            <LinkedItems ids={obligation.linked_risk_ids} names={riskNames} entityName="Risk" path="/risks" ItemIcon={AlertTriangle} color="border-red-200 text-red-700 bg-red-50" obligationTitle={obligation.title} />
+            <LinkedItems ids={obligation.linked_control_ids} names={controlNames} entityName="Control" path="/controls" ItemIcon={Shield} color="border-blue-200 text-blue-700 bg-blue-50" obligationTitle={obligation.title} />
+            <LinkedItems ids={obligation.linked_task_ids} names={taskNames} entityName="Task" path="/tasks" ItemIcon={CheckSquare} color="border-green-200 text-green-700 bg-green-50" obligationTitle={obligation.title} />
           </div>
         </td>
       </tr>
@@ -144,6 +150,14 @@ export default function ObligationRegister() {
     queryKey: ['obligations'],
     queryFn: () => base44.entities.Obligation.list('-created_date'),
   });
+
+  const { data: risks = [] } = useQuery({ queryKey: ['risks'], queryFn: () => base44.entities.Risk.list() });
+  const { data: controls = [] } = useQuery({ queryKey: ['controls'], queryFn: () => base44.entities.Control.list() });
+  const { data: tasks = [] } = useQuery({ queryKey: ['tasks'], queryFn: () => base44.entities.Task.list() });
+
+  const riskMap = Object.fromEntries(risks.map(r => [r.id, r.title]));
+  const controlMap = Object.fromEntries(controls.map(c => [c.id, c.title]));
+  const taskMap = Object.fromEntries(tasks.map(t => [t.id, t.title]));
 
   const grouped = ['SOC2', 'ISO27001', 'ASAE3150', 'CDR'].reduce((acc, fw) => {
     acc[fw] = obligations.filter(o => {
@@ -265,7 +279,7 @@ export default function ObligationRegister() {
                       </tr>
                     </thead>
                     <tbody>
-                      {items.map(o => <ObligationRow key={o.id} obligation={o} />)}
+                      {items.map(o => <ObligationRow key={o.id} obligation={o} riskMap={riskMap} controlMap={controlMap} taskMap={taskMap} />)}
                     </tbody>
                   </table>
                 </div>

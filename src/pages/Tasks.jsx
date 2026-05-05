@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { Plus, Search, CheckSquare, Pencil, Trash2, BookOpen, X } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import TaskGuidePanel from '../components/guides/TaskGuidePanel';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -26,14 +26,13 @@ export default function Tasks() {
   const [editing, setEditing] = useState(null);
   const [deleteId, setDeleteId] = useState(null);
   const [guideTask, setGuideTask] = useState(null);
-  const [obligationFilter, setObligationFilter] = useState(null); // { ids: [...], label }
-
-  useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
+  const location = useLocation();
+  const obligationFilter = useMemo(() => {
+    const params = new URLSearchParams(location.search);
     const ids = params.get('ids');
     const label = params.get('from');
-    if (ids) setObligationFilter({ ids: ids.split(','), label: label || 'Obligation' });
-  }, []);
+    return ids ? { ids: ids.split(','), label: label || 'Obligation' } : null;
+  }, [location.search]);
 
   const { data: tasks = [] } = useQuery({
     queryKey: ['tasks'],
@@ -78,7 +77,7 @@ export default function Tasks() {
       {obligationFilter && (
         <div className="flex items-center justify-between mb-4 px-4 py-2.5 bg-green-50 border border-green-200 rounded-xl text-sm text-green-800">
           <span>Filtered by obligation: <strong>{obligationFilter.label}</strong> — showing {filtered.length} linked task{filtered.length !== 1 ? 's' : ''}</span>
-          <Link to="/tasks" onClick={() => setObligationFilter(null)} className="flex items-center gap-1 text-green-700 hover:text-green-900 font-medium">
+          <Link to="/tasks" className="flex items-center gap-1 text-green-700 hover:text-green-900 font-medium">
             <X className="w-3.5 h-3.5" /> Clear filter
           </Link>
         </div>
