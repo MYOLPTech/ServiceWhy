@@ -1,0 +1,221 @@
+-- Compliance Management System Schema
+-- Run ID: 2026-05-05_061301
+-- Generated: 2026-05-05T06:13:01.380Z
+
+-- Control Table
+CREATE TABLE IF NOT EXISTS "control" (
+  id UUID PRIMARY KEY,
+  created_date TIMESTAMP WITH TIME ZONE,
+  updated_date TIMESTAMP WITH TIME ZONE,
+  created_by TEXT,
+  "owner" TEXT,
+  "control_id" TEXT,
+  "best_practices" JSONB,
+  "target_date" TEXT,
+  "description" TEXT,
+  "implementation_notes" TEXT,
+  "implementation_type" TEXT,
+  "title" TEXT,
+  "priority" TEXT,
+  "evidence_required" TEXT,
+  "implementation_overview" TEXT,
+  "common_pitfalls" JSONB,
+  "frequency" TEXT,
+  "framework" TEXT,
+  "manual_procedures" TEXT,
+  "automation_details" TEXT,
+  "testing_and_validation" TEXT,
+  "category" TEXT,
+  "status" TEXT,
+  "implementation_steps" JSONB,
+  "tools_and_systems" JSONB,
+  "created_by_id" TEXT,
+  "is_sample" BOOLEAN
+);
+
+-- Risk Table
+CREATE TABLE IF NOT EXISTS "risk" (
+  id UUID PRIMARY KEY,
+  created_date TIMESTAMP WITH TIME ZONE,
+  updated_date TIMESTAMP WITH TIME ZONE,
+  created_by TEXT,
+  "owner" TEXT,
+  "treatment" TEXT,
+  "risk_id" TEXT,
+  "likelihood" NUMERIC,
+  "risk_score" NUMERIC,
+  "frameworks" JSONB,
+  "treatment_plan" TEXT,
+  "impact" NUMERIC,
+  "description" TEXT,
+  "title" TEXT,
+  "category" TEXT,
+  "status" TEXT,
+  "linked_obligation_ids" JSONB,
+  "linked_task_ids" JSONB,
+  "created_by_id" TEXT,
+  "is_sample" BOOLEAN
+);
+
+-- Policy Table
+CREATE TABLE IF NOT EXISTS "policy" (
+  id UUID PRIMARY KEY,
+  created_date TIMESTAMP WITH TIME ZONE,
+  updated_date TIMESTAMP WITH TIME ZONE,
+  created_by TEXT,
+  "owner" TEXT,
+  "approver" TEXT,
+  "file_url" TEXT,
+  "policy_id" TEXT,
+  "frameworks" JSONB,
+  "description" TEXT,
+  "title" TEXT,
+  "approved_date" TEXT,
+  "version" TEXT,
+  "policy_content" TEXT,
+  "review_date" DATE,
+  "category" TEXT,
+  "status" TEXT,
+  "created_by_id" TEXT,
+  "is_sample" BOOLEAN
+);
+
+-- Task Table
+CREATE TABLE IF NOT EXISTS "task" (
+  id UUID PRIMARY KEY,
+  created_date TIMESTAMP WITH TIME ZONE,
+  updated_date TIMESTAMP WITH TIME ZONE,
+  created_by TEXT,
+  "framework" TEXT,
+  "linked_control_id" TEXT,
+  "due_date" TEXT,
+  "description" TEXT,
+  "task_id" TEXT,
+  "assignee" TEXT,
+  "title" TEXT,
+  "type" TEXT,
+  "priority" TEXT,
+  "status" TEXT,
+  "created_by_id" TEXT,
+  "is_sample" BOOLEAN
+);
+
+-- Evidence Table
+CREATE TABLE IF NOT EXISTS "evidence" (
+  id UUID PRIMARY KEY,
+  created_date TIMESTAMP WITH TIME ZONE,
+  updated_date TIMESTAMP WITH TIME ZONE,
+  created_by TEXT,
+  "file_url" TEXT,
+  "control_id" TEXT,
+  "framework" TEXT,
+  "file_name" TEXT,
+  "review_notes" TEXT,
+  "expiry_date" TEXT,
+  "description" TEXT,
+  "title" TEXT,
+  "status" TEXT,
+  "created_by_id" TEXT,
+  "is_sample" BOOLEAN
+);
+
+-- CmdbItem Table
+CREATE TABLE IF NOT EXISTS "cmdbitem" (
+  id UUID PRIMARY KEY,
+  created_date TIMESTAMP WITH TIME ZONE,
+  updated_date TIMESTAMP WITH TIME ZONE,
+  created_by TEXT,
+  "notes" TEXT,
+  "criticality" TEXT,
+  "description" TEXT,
+  "linked_risk_ids" JSONB,
+  "asset_id" TEXT,
+  "type" TEXT,
+  "linked_control_ids" JSONB,
+  "decommission_date" TEXT,
+  "data_classification" TEXT,
+  "deleted_date" TEXT,
+  "is_deleted" BOOLEAN,
+  "vendor" TEXT,
+  "linked_task_ids" JSONB,
+  "owner" TEXT,
+  "os" TEXT,
+  "ip_address" TEXT,
+  "version" TEXT,
+  "last_reviewed" TEXT,
+  "environment" TEXT,
+  "linked_vendor_ids" JSONB,
+  "name" TEXT,
+  "location" TEXT,
+  "category" TEXT,
+  "linked_evidence_ids" JSONB,
+  "status" TEXT,
+  "created_by_id" TEXT,
+  "is_sample" BOOLEAN
+);
+
+-- Vendor Table
+CREATE TABLE IF NOT EXISTS "vendor" (
+  id UUID PRIMARY KEY,
+  created_date TIMESTAMP WITH TIME ZONE,
+  updated_date TIMESTAMP WITH TIME ZONE,
+  created_by TEXT,
+  "notes" TEXT,
+  "contact_phone" TEXT,
+  "contract_status" TEXT,
+  "criticality" TEXT,
+  "risk_assessment" TEXT,
+  "due_diligence_status" TEXT,
+  "description" TEXT,
+  "linked_risk_ids" JSONB,
+  "linked_control_ids" JSONB,
+  "contract_start_date" TEXT,
+  "contact_email" TEXT,
+  "contract_end_date" TEXT,
+  "mitigation_strategy" TEXT,
+  "sla_coverage" TEXT,
+  "due_diligence_date" TEXT,
+  "linked_task_ids" JSONB,
+  "compliance_status" TEXT,
+  "owner" TEXT,
+  "website" TEXT,
+  "risk_score" TEXT,
+  "certifications" JSONB,
+  "risk_level" TEXT,
+  "data_access_level" TEXT,
+  "next_audit_date" TEXT,
+  "last_audit_date" TEXT,
+  "applicable_frameworks" JSONB,
+  "vendor_id" TEXT,
+  "name" TEXT,
+  "category" TEXT,
+  "primary_contact" TEXT,
+  "status" TEXT,
+  "created_by_id" TEXT,
+  "is_sample" BOOLEAN
+);
+
+-- Obligation Table
+CREATE TABLE IF NOT EXISTS "obligation" (
+  id UUID PRIMARY KEY,
+  created_date TIMESTAMP WITH TIME ZONE,
+  updated_date TIMESTAMP WITH TIME ZONE,
+  created_by TEXT,
+  "owner" TEXT,
+  "due_date" TEXT,
+  "obligation_id" TEXT,
+  "description" TEXT,
+  "linked_risk_ids" JSONB,
+  "title" TEXT,
+  "priority" TEXT,
+  "linked_control_ids" JSONB,
+  "source_reference" TEXT,
+  "framework" TEXT,
+  "evidence_notes" TEXT,
+  "category" TEXT,
+  "linked_policy_ids" JSONB,
+  "linked_task_ids" JSONB,
+  "status" TEXT,
+  "created_by_id" TEXT,
+  "is_sample" BOOLEAN
+);
