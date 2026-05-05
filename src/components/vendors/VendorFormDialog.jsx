@@ -432,7 +432,7 @@ export default function VendorFormDialog({ open, onOpenChange, vendor, onSave, s
               <div className="space-y-3 pt-4 border-t">
                 <h4 className="font-semibold">Applicable Frameworks</h4>
                 <div className="grid grid-cols-2 gap-2">
-                  {['SOC2','ISO27001','ASAE3150','GDPR','HIPAA'].map(fw => (
+                  {['SOC2','ISO27001','ISO27017','ISO27018','ASAE3150','GDPR','HIPAA'].map(fw => (
                     <label key={fw} className="flex items-center gap-2 cursor-pointer">
                       <Checkbox checked={form.applicable_frameworks.includes(fw)} onCheckedChange={() => toggleFramework(fw)} />
                       <span className="text-sm">{fw}</span>
