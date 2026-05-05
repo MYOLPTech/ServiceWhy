@@ -1,6 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
+
+function generateNextId(records, field, prefix) {
+  const nums = records.map(r => parseInt((r[field] || '').replace(prefix + '-', ''), 10)).filter(n => !isNaN(n));
+  const next = nums.length > 0 ? Math.max(...nums) + 1 : 1;
+  return `${prefix}-${String(next).padStart(3, '0')}`;
+}
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -23,7 +29,14 @@ export default function CmdbFormDialog({ open, onOpenChange, item, onSave, savin
   const [form, setForm] = useState(DEFAULT);
 
   useEffect(() => {
-    if (open) setForm(item ? { ...DEFAULT, ...item } : DEFAULT);
+    if (!open) return;
+    if (item) {
+      setForm({ ...DEFAULT, ...item });
+    } else {
+      base44.entities.CmdbItem.list().then(records => {
+        setForm({ ...DEFAULT, asset_id: generateNextId(records, 'asset_id', 'ASSET') });
+      });
+    }
   }, [open, item]);
 
   const { data: controls = [] } = useQuery({ queryKey: ['controls'], queryFn: () => base44.entities.Control.list() });
@@ -57,7 +70,7 @@ export default function CmdbFormDialog({ open, onOpenChange, item, onSave, savin
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-1.5">
                   <Label>Asset ID</Label>
-                  <Input placeholder="ASSET-001" value={form.asset_id} onChange={e => set('asset_id', e.target.value)} />
+                  <Input value={form.asset_id} readOnly className="bg-muted text-muted-foreground cursor-not-allowed font-mono text-sm" />
                 </div>
                 <div className="space-y-1.5">
                   <Label>Name *</Label>

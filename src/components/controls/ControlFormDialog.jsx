@@ -5,6 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { base44 } from '@/api/base44Client';
 
 const emptyControl = {
   control_id: '', title: '', description: '', framework: 'SOC2', category: '',
@@ -12,11 +13,24 @@ const emptyControl = {
   evidence_required: '', target_date: ''
 };
 
+function generateNextId(records, field, prefix) {
+  const nums = records.map(r => parseInt((r[field] || '').replace(prefix + '-', ''), 10)).filter(n => !isNaN(n));
+  const next = nums.length > 0 ? Math.max(...nums) + 1 : 1;
+  return `${prefix}-${String(next).padStart(3, '0')}`;
+}
+
 export default function ControlFormDialog({ open, onOpenChange, control, onSave, saving }) {
   const [form, setForm] = useState(emptyControl);
 
   useEffect(() => {
-    setForm(control ? { ...emptyControl, ...control } : emptyControl);
+    if (!open) return;
+    if (control) {
+      setForm({ ...emptyControl, ...control });
+    } else {
+      base44.entities.Control.list().then(records => {
+        setForm({ ...emptyControl, control_id: generateNextId(records, 'control_id', 'CTL') });
+      });
+    }
   }, [control, open]);
 
   const handleSubmit = (e) => {
@@ -34,7 +48,7 @@ export default function ControlFormDialog({ open, onOpenChange, control, onSave,
           <div className="grid grid-cols-2 gap-4">
             <div>
               <Label>Control ID</Label>
-              <Input value={form.control_id} onChange={e => setForm({...form, control_id: e.target.value})} placeholder="e.g. CC1.1" />
+              <Input value={form.control_id} readOnly className="bg-muted text-muted-foreground cursor-not-allowed font-mono text-sm" />
             </div>
             <div>
               <Label>Framework *</Label>

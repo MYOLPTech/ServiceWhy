@@ -5,17 +5,31 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { base44 } from '@/api/base44Client';
 
 const emptyTask = {
   task_id: '', title: '', description: '', type: 'implementation', status: 'todo',
   priority: 'medium', assignee: '', framework: 'All', linked_control_id: '', due_date: ''
 };
 
+function generateNextId(records, field, prefix) {
+  const nums = records.map(r => parseInt((r[field] || '').replace(prefix + '-', ''), 10)).filter(n => !isNaN(n));
+  const next = nums.length > 0 ? Math.max(...nums) + 1 : 1;
+  return `${prefix}-${String(next).padStart(3, '0')}`;
+}
+
 export default function TaskFormDialog({ open, onOpenChange, task, controls, onSave, saving }) {
   const [form, setForm] = useState(emptyTask);
 
   useEffect(() => {
-    setForm(task ? { ...emptyTask, ...task } : emptyTask);
+    if (!open) return;
+    if (task) {
+      setForm({ ...emptyTask, ...task });
+    } else {
+      base44.entities.Task.list().then(records => {
+        setForm({ ...emptyTask, task_id: generateNextId(records, 'task_id', 'TSK') });
+      });
+    }
   }, [task, open]);
 
   const handleSubmit = (e) => {
@@ -33,7 +47,7 @@ export default function TaskFormDialog({ open, onOpenChange, task, controls, onS
           <div className="grid grid-cols-3 gap-4">
             <div>
               <Label>Task ID</Label>
-              <Input placeholder="TSK-001" value={form.task_id || ''} onChange={e => setForm({...form, task_id: e.target.value})} className="font-mono text-sm" />
+              <Input value={form.task_id || ''} readOnly className="bg-muted text-muted-foreground cursor-not-allowed font-mono text-sm" />
             </div>
             <div className="col-span-2">
               <Label>Title *</Label>

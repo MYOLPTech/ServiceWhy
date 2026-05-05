@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -7,6 +8,12 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
 import { base44 } from '@/api/base44Client';
+
+function generateNextId(records, field, prefix) {
+  const nums = records.map(r => parseInt((r[field] || '').replace(prefix + '-', ''), 10)).filter(n => !isNaN(n));
+  const next = nums.length > 0 ? Math.max(...nums) + 1 : 1;
+  return `${prefix}-${String(next).padStart(3, '0')}`;
+}
 import { Upload } from 'lucide-react';
 
 const categories = [
@@ -31,7 +38,7 @@ const categories = [
 const frameworkOptions = ['SOC2', 'ASAE3150', 'ISO27001'];
 
 const emptyPolicy = {
-  title: '', description: '', category: 'information_security', version: '1.0',
+  policy_id: '', title: '', description: '', category: 'information_security', version: '1.0',
   status: 'draft', owner: '', approver: '', file_url: '', policy_content: '',
   frameworks: [], review_date: '', approved_date: ''
 };
@@ -42,8 +49,15 @@ export default function PolicyFormDialog({ open, onOpenChange, policy, onSave, s
   const [tab, setTab] = useState('details');
 
   useEffect(() => {
-    setForm(policy ? { ...emptyPolicy, ...policy, frameworks: policy.frameworks || [] } : emptyPolicy);
+    if (!open) return;
     setTab('details');
+    if (policy) {
+      setForm({ ...emptyPolicy, ...policy, frameworks: policy.frameworks || [] });
+    } else {
+      base44.entities.Policy.list().then(records => {
+        setForm({ ...emptyPolicy, policy_id: generateNextId(records, 'policy_id', 'POL'), frameworks: [] });
+      });
+    }
   }, [policy, open]);
 
   const toggleFramework = (fw) => {
@@ -93,9 +107,15 @@ export default function PolicyFormDialog({ open, onOpenChange, policy, onSave, s
         <form onSubmit={handleSubmit} className="space-y-4">
           {tab === 'details' && (
             <>
-              <div>
-                <Label>Title *</Label>
-                <Input value={form.title} onChange={e => setForm({...form, title: e.target.value})} required />
+              <div className="grid grid-cols-3 gap-4">
+                <div>
+                  <Label>Policy ID</Label>
+                  <Input value={form.policy_id || ''} readOnly className="bg-muted text-muted-foreground cursor-not-allowed font-mono text-sm" />
+                </div>
+                <div className="col-span-2">
+                  <Label>Title *</Label>
+                  <Input value={form.title} onChange={e => setForm({...form, title: e.target.value})} required />
+                </div>
               </div>
               <div>
                 <Label>Description</Label>

@@ -6,6 +6,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Slider } from '@/components/ui/slider';
+import { base44 } from '@/api/base44Client';
 
 const emptyRisk = {
   risk_id: '', title: '', description: '', category: 'operational', likelihood: 3, impact: 3,
@@ -13,11 +14,24 @@ const emptyRisk = {
   frameworks: []
 };
 
+function generateNextId(records, field, prefix) {
+  const nums = records.map(r => parseInt((r[field] || '').replace(prefix + '-', ''), 10)).filter(n => !isNaN(n));
+  const next = nums.length > 0 ? Math.max(...nums) + 1 : 1;
+  return `${prefix}-${String(next).padStart(3, '0')}`;
+}
+
 export default function RiskFormDialog({ open, onOpenChange, risk, onSave, saving }) {
   const [form, setForm] = useState(emptyRisk);
 
   useEffect(() => {
-    setForm(risk ? { ...emptyRisk, ...risk } : emptyRisk);
+    if (!open) return;
+    if (risk) {
+      setForm({ ...emptyRisk, ...risk });
+    } else {
+      base44.entities.Risk.list().then(records => {
+        setForm({ ...emptyRisk, risk_id: generateNextId(records, 'risk_id', 'RSK') });
+      });
+    }
   }, [risk, open]);
 
   const updateScore = (field, val) => {
@@ -43,7 +57,7 @@ export default function RiskFormDialog({ open, onOpenChange, risk, onSave, savin
           <div className="grid grid-cols-3 gap-4">
             <div>
               <Label>Risk ID</Label>
-              <Input placeholder="RSK-001" value={form.risk_id || ''} onChange={e => setForm({...form, risk_id: e.target.value})} className="font-mono text-sm" />
+              <Input value={form.risk_id || ''} readOnly className="bg-muted text-muted-foreground cursor-not-allowed font-mono text-sm" />
             </div>
             <div className="col-span-2">
               <Label>Title *</Label>
