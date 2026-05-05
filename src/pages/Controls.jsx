@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
-import { Plus, Search, Filter, Pencil, Trash2, Shield } from 'lucide-react';
+import { Plus, Search, Filter, Pencil, Trash2, Shield, BookOpen } from 'lucide-react';
+import ControlGuidePanel from '../components/guides/ControlGuidePanel';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -21,6 +22,7 @@ export default function Controls() {
   const [formOpen, setFormOpen] = useState(false);
   const [editingControl, setEditingControl] = useState(null);
   const [deleteId, setDeleteId] = useState(null);
+  const [guideControl, setGuideControl] = useState(null);
 
   const { data: controls = [], isLoading } = useQuery({
     queryKey: ['controls'],
@@ -131,6 +133,7 @@ export default function Controls() {
                   <TableCell className="text-sm text-muted-foreground">{control.owner || '—'}</TableCell>
                   <TableCell>
                     <div className="flex items-center gap-1">
+                      <Button variant="ghost" size="icon" className="h-8 w-8 text-primary" title="Implementation guide" onClick={() => setGuideControl(control)}><BookOpen className="w-3.5 h-3.5" /></Button>
                       <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => { setEditingControl(control); setFormOpen(true); }}>
                         <Pencil className="w-3.5 h-3.5" />
                       </Button>
@@ -146,6 +149,7 @@ export default function Controls() {
         )}
       </div>
 
+      {guideControl && <ControlGuidePanel control={guideControl} onClose={() => setGuideControl(null)} />}
       <ControlFormDialog
         open={formOpen}
         onOpenChange={setFormOpen}

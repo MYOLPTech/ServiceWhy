@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
-import { Plus, Search, CheckSquare, Pencil, Trash2 } from 'lucide-react';
+import { Plus, Search, CheckSquare, Pencil, Trash2, BookOpen } from 'lucide-react';
+import TaskGuidePanel from '../components/guides/TaskGuidePanel';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -23,6 +24,7 @@ export default function Tasks() {
   const [formOpen, setFormOpen] = useState(false);
   const [editing, setEditing] = useState(null);
   const [deleteId, setDeleteId] = useState(null);
+  const [guideTask, setGuideTask] = useState(null);
 
   const { data: tasks = [] } = useQuery({
     queryKey: ['tasks'],
@@ -129,6 +131,7 @@ export default function Tasks() {
                   </TableCell>
                   <TableCell>
                     <div className="flex items-center gap-1">
+                      <Button variant="ghost" size="icon" className="h-8 w-8 text-primary" title="Implementation guide" onClick={() => setGuideTask(task)}><BookOpen className="w-3.5 h-3.5" /></Button>
                       <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => { setEditing(task); setFormOpen(true); }}><Pencil className="w-3.5 h-3.5" /></Button>
                       <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive" onClick={() => setDeleteId(task.id)}><Trash2 className="w-3.5 h-3.5" /></Button>
                     </div>
@@ -140,6 +143,7 @@ export default function Tasks() {
         )}
       </div>
 
+      {guideTask && <TaskGuidePanel task={guideTask} onClose={() => setGuideTask(null)} />}
       <TaskFormDialog open={formOpen} onOpenChange={setFormOpen} task={editing} controls={controls} onSave={handleSave} saving={createMutation.isPending || updateMutation.isPending} />
       <AlertDialog open={!!deleteId} onOpenChange={() => setDeleteId(null)}>
         <AlertDialogContent>

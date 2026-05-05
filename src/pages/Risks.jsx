@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
-import { Plus, Search, AlertTriangle, Pencil, Trash2 } from 'lucide-react';
+import { Plus, Search, AlertTriangle, Pencil, Trash2, BookOpen } from 'lucide-react';
+import RiskGuidePanel from '../components/guides/RiskGuidePanel';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -25,6 +26,7 @@ export default function Risks() {
   const [formOpen, setFormOpen] = useState(false);
   const [editing, setEditing] = useState(null);
   const [deleteId, setDeleteId] = useState(null);
+  const [guideRisk, setGuideRisk] = useState(null);
 
   const { data: risks = [] } = useQuery({
     queryKey: ['risks'],
@@ -120,6 +122,7 @@ export default function Risks() {
                   <TableCell className="text-sm text-muted-foreground">{risk.owner || '—'}</TableCell>
                   <TableCell>
                     <div className="flex items-center gap-1">
+                      <Button variant="ghost" size="icon" className="h-8 w-8 text-primary" title="Risk management guide" onClick={() => setGuideRisk(risk)}><BookOpen className="w-3.5 h-3.5" /></Button>
                       <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => { setEditing(risk); setFormOpen(true); }}>
                         <Pencil className="w-3.5 h-3.5" />
                       </Button>
@@ -135,6 +138,7 @@ export default function Risks() {
         )}
       </div>
 
+      {guideRisk && <RiskGuidePanel risk={guideRisk} onClose={() => setGuideRisk(null)} />}
       <RiskFormDialog open={formOpen} onOpenChange={setFormOpen} risk={editing} onSave={handleSave} saving={createMutation.isPending || updateMutation.isPending} />
 
       <AlertDialog open={!!deleteId} onOpenChange={() => setDeleteId(null)}>
