@@ -1,8 +1,10 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
-import { Shield, FileCheck, AlertTriangle, CheckSquare, FileText, ArrowRight } from 'lucide-react';
+import { Shield, FileCheck, AlertTriangle, CheckSquare, FileText, ArrowRight, Database } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { Button } from '@/components/ui/button';
+import { toast } from 'sonner';
 import StatCard from '../components/dashboard/StatCard';
 import FrameworkProgress from '../components/dashboard/FrameworkProgress';
 import PageHeader from '../components/shared/PageHeader';
@@ -11,6 +13,8 @@ import FrameworkBadge from '../components/shared/FrameworkBadge';
 import { format } from 'date-fns';
 
 export default function Dashboard() {
+  const [datapumpLoading, setDatapumpLoading] = useState(false);
+
   const { data: controls = [] } = useQuery({
     queryKey: ['controls'],
     queryFn: () => base44.entities.Control.list(),
@@ -33,6 +37,33 @@ export default function Dashboard() {
     queryFn: () => base44.entities.Evidence.list(),
   });
 
+  const handleDatapump = async () => {
+    setDatapumpLoading(true);
+    try {
+      const response = await base44.functions.invoke('datapump', {});
+      const { files } = response.data;
+
+      // Create downloadable files
+      for (const [key, fileData] of Object.entries(files)) {
+        const blob = new Blob([fileData.content], { type: key === 'json' ? 'application/json' : 'text/plain' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = fileData.name;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+      }
+
+      toast.success('Data export generated and downloaded');
+    } catch (error) {
+      toast.error('Failed to generate data export');
+    } finally {
+      setDatapumpLoading(false);
+    }
+  };
+
   const implementedControls = controls.filter(c => c.status === 'implemented' || c.status === 'verified').length;
   const openRisks = risks.filter(r => r.status === 'open' || r.status === 'in_treatment').length;
   const pendingTasks = tasks.filter(t => t.status === 'todo' || t.status === 'in_progress').length;
@@ -51,6 +82,12 @@ export default function Dashboard() {
       <PageHeader
         title="Compliance Dashboard"
         description="Monitor your SOC 2, ASAE 3150, and ISO 27001 compliance journey"
+        actions={
+          <Button onClick={handleDatapump} disabled={datapumpLoading} className="gap-2">
+            <Database className="w-4 h-4" />
+            {datapumpLoading ? 'Generating...' : 'DATAPUMP'}
+          </Button>
+        }
       />
 
       {/* Stats Row */}
