@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { Link } from 'react-router-dom';
-import { Search, Filter, ExternalLink, AlertTriangle, Shield, CheckSquare, ChevronDown, ChevronRight, Info } from 'lucide-react';
+import { Search, Filter, ExternalLink, AlertTriangle, Shield, CheckSquare, ChevronDown, ChevronRight, Info, FileText } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -54,11 +54,12 @@ function LinkedItems({ ids = [], names = [], entityName, path, ItemIcon, color, 
   );
 }
 
-function ObligationRow({ obligation, riskMap, controlMap, taskMap }) {
+function ObligationRow({ obligation, riskMap, controlMap, policyMap, taskMap }) {
   const [expanded, setExpanded] = useState(false);
   const fw = FRAMEWORK_STYLES[obligation.framework] || FRAMEWORK_STYLES.SOC2;
   const riskNames = (obligation.linked_risk_ids || []).map(id => riskMap[id]).filter(Boolean);
   const controlNames = (obligation.linked_control_ids || []).map(id => controlMap[id]).filter(Boolean);
+  const policyNames = (obligation.linked_policy_ids || []).map(id => policyMap[id]).filter(Boolean);
   const taskNames = (obligation.linked_task_ids || []).map(id => taskMap[id]).filter(Boolean);
 
   return (
@@ -95,11 +96,12 @@ function ObligationRow({ obligation, riskMap, controlMap, taskMap }) {
         <td className="px-2 py-3 text-sm text-muted-foreground">{obligation.owner || '—'}</td>
         <td className="px-2 py-3 text-xs text-muted-foreground font-mono">{obligation.source_reference || '—'}</td>
         <td className="px-2 py-3">
-          <div className="flex flex-col gap-1">
-            <LinkedItems ids={obligation.linked_risk_ids} names={riskNames} entityName="Risk" path="/risks" ItemIcon={AlertTriangle} color="border-red-200 text-red-700 bg-red-50" obligationTitle={obligation.title} />
-            <LinkedItems ids={obligation.linked_control_ids} names={controlNames} entityName="Control" path="/controls" ItemIcon={Shield} color="border-blue-200 text-blue-700 bg-blue-50" obligationTitle={obligation.title} />
-            <LinkedItems ids={obligation.linked_task_ids} names={taskNames} entityName="Task" path="/tasks" ItemIcon={CheckSquare} color="border-green-200 text-green-700 bg-green-50" obligationTitle={obligation.title} />
-          </div>
+         <div className="flex flex-col gap-1">
+           <LinkedItems ids={obligation.linked_risk_ids} names={riskNames} entityName="Risk" path="/risks" ItemIcon={AlertTriangle} color="border-red-200 text-red-700 bg-red-50" obligationTitle={obligation.title} />
+           <LinkedItems ids={obligation.linked_control_ids} names={controlNames} entityName="Control" path="/controls" ItemIcon={Shield} color="border-blue-200 text-blue-700 bg-blue-50" obligationTitle={obligation.title} />
+           <LinkedItems ids={obligation.linked_policy_ids} names={policyNames} entityName="Policy" path="/policies" ItemIcon={FileText} color="border-purple-200 text-purple-700 bg-purple-50" obligationTitle={obligation.title} />
+           <LinkedItems ids={obligation.linked_task_ids} names={taskNames} entityName="Task" path="/tasks" ItemIcon={CheckSquare} color="border-green-200 text-green-700 bg-green-50" obligationTitle={obligation.title} />
+         </div>
         </td>
       </tr>
       {expanded && (
@@ -124,9 +126,14 @@ function ObligationRow({ obligation, riskMap, controlMap, taskMap }) {
                 </Link>
               )}
               {(obligation.linked_control_ids?.length > 0) && (
-                <Link to={`/controls?ids=${obligation.linked_control_ids.join(',')}&from=${encodeURIComponent(obligation.title)}`} className="inline-flex items-center gap-1 text-blue-600 hover:underline font-medium">
-                  <Shield className="w-3 h-3" /> View {obligation.linked_control_ids.length} linked control{obligation.linked_control_ids.length > 1 ? 's' : ''}
-                </Link>
+               <Link to={`/controls?ids=${obligation.linked_control_ids.join(',')}&from=${encodeURIComponent(obligation.title)}`} className="inline-flex items-center gap-1 text-blue-600 hover:underline font-medium">
+                 <Shield className="w-3 h-3" /> View {obligation.linked_control_ids.length} linked control{obligation.linked_control_ids.length > 1 ? 's' : ''}
+               </Link>
+              )}
+              {(obligation.linked_policy_ids?.length > 0) && (
+               <Link to={`/policies?ids=${obligation.linked_policy_ids.join(',')}&from=${encodeURIComponent(obligation.title)}`} className="inline-flex items-center gap-1 text-purple-600 hover:underline font-medium">
+                 <FileText className="w-3 h-3" /> View {obligation.linked_policy_ids.length} linked polic{obligation.linked_policy_ids.length > 1 ? 'ies' : 'y'}
+               </Link>
               )}
               {(obligation.linked_task_ids?.length > 0) && (
                 <Link to={`/tasks?ids=${obligation.linked_task_ids.join(',')}&from=${encodeURIComponent(obligation.title)}`} className="inline-flex items-center gap-1 text-green-600 hover:underline font-medium">
@@ -153,10 +160,12 @@ export default function ObligationRegister() {
 
   const { data: risks = [] } = useQuery({ queryKey: ['risks'], queryFn: () => base44.entities.Risk.list() });
   const { data: controls = [] } = useQuery({ queryKey: ['controls'], queryFn: () => base44.entities.Control.list() });
+  const { data: policies = [] } = useQuery({ queryKey: ['policies'], queryFn: () => base44.entities.Policy.list() });
   const { data: tasks = [] } = useQuery({ queryKey: ['tasks'], queryFn: () => base44.entities.Task.list() });
 
   const riskMap = Object.fromEntries(risks.map(r => [r.id, r.title]));
   const controlMap = Object.fromEntries(controls.map(c => [c.id, c.title]));
+  const policyMap = Object.fromEntries(policies.map(p => [p.id, p.title]));
   const taskMap = Object.fromEntries(tasks.map(t => [t.id, t.title]));
 
   const grouped = ['SOC2', 'ISO27001', 'ASAE3150', 'CDR'].reduce((acc, fw) => {
@@ -231,6 +240,7 @@ export default function ObligationRegister() {
       <div className="flex flex-wrap gap-4 mb-4 text-xs text-muted-foreground">
         <span className="flex items-center gap-1"><AlertTriangle className="w-3 h-3 text-red-500" /> Risk link</span>
         <span className="flex items-center gap-1"><Shield className="w-3 h-3 text-blue-500" /> Control link</span>
+        <span className="flex items-center gap-1"><FileText className="w-3 h-3 text-purple-500" /> Policy link</span>
         <span className="flex items-center gap-1"><CheckSquare className="w-3 h-3 text-green-500" /> Task link</span>
         <span className="flex items-center gap-1"><Info className="w-3 h-3" /> Click any row to expand details</span>
       </div>
@@ -279,7 +289,7 @@ export default function ObligationRegister() {
                       </tr>
                     </thead>
                     <tbody>
-                      {items.map(o => <ObligationRow key={o.id} obligation={o} riskMap={riskMap} controlMap={controlMap} taskMap={taskMap} />)}
+                      {items.map(o => <ObligationRow key={o.id} obligation={o} riskMap={riskMap} controlMap={controlMap} policyMap={policyMap} taskMap={taskMap} />)}
                     </tbody>
                   </table>
                 </div>
