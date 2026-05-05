@@ -107,6 +107,13 @@
       },
       "description": "IDs of linked Vendor records"
     },
+    "linked_incident_ids": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "IDs of linked Incident records"
+    },
     "source_reference": {
       "type": "string",
       "description": "Reference to source document section (e.g. CDR Rules s56, Privacy Act APP 11)"

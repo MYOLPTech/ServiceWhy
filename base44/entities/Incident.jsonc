@@ -1,0 +1,252 @@
+{
+  "name": "Incident",
+  "type": "object",
+  "properties": {
+    "incident_id": {
+      "type": "string",
+      "description": "Unique incident identifier (e.g. INC-001)"
+    },
+    "title": {
+      "type": "string",
+      "description": "Incident title"
+    },
+    "description": {
+      "type": "string",
+      "description": "Detailed description of the incident"
+    },
+    "category": {
+      "type": "string",
+      "enum": [
+        "security_breach",
+        "data_loss",
+        "service_outage",
+        "unauthorized_access",
+        "malware",
+        "phishing",
+        "insider_threat",
+        "ddos",
+        "configuration_error",
+        "third_party",
+        "physical_security",
+        "compliance_violation",
+        "other"
+      ],
+      "default": "other",
+      "description": "Type of incident"
+    },
+    "severity": {
+      "type": "string",
+      "enum": [
+        "critical",
+        "high",
+        "medium",
+        "low"
+      ],
+      "default": "medium",
+      "description": "Incident severity level"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "new",
+        "investigating",
+        "contained",
+        "remediated",
+        "resolved",
+        "closed"
+      ],
+      "default": "new"
+    },
+    "priority": {
+      "type": "string",
+      "enum": [
+        "p1",
+        "p2",
+        "p3",
+        "p4"
+      ],
+      "default": "p3",
+      "description": "Response priority (P1 = highest)"
+    },
+    "impact": {
+      "type": "string",
+      "enum": [
+        "critical",
+        "high",
+        "medium",
+        "low",
+        "none"
+      ],
+      "default": "medium",
+      "description": "Business impact level"
+    },
+    "detection_source": {
+      "type": "string",
+      "enum": [
+        "monitoring_alert",
+        "user_report",
+        "security_team",
+        "third_party",
+        "audit",
+        "automated_scan",
+        "other"
+      ],
+      "default": "monitoring_alert",
+      "description": "How the incident was detected"
+    },
+    "detected_date": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Date and time the incident was detected"
+    },
+    "occurred_date": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Estimated date and time the incident occurred"
+    },
+    "resolved_date": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Date and time the incident was resolved"
+    },
+    "reported_by": {
+      "type": "string",
+      "description": "Person who reported the incident"
+    },
+    "owner": {
+      "type": "string",
+      "description": "Incident owner / lead handler"
+    },
+    "assigned_team": {
+      "type": "string",
+      "description": "Team handling the incident (e.g. SOC, IT Ops, DevOps)"
+    },
+    "affected_systems": {
+      "type": "string",
+      "description": "Systems/services affected by the incident"
+    },
+    "affected_users_count": {
+      "type": "number",
+      "description": "Number of users affected"
+    },
+    "data_affected": {
+      "type": "string",
+      "enum": [
+        "none",
+        "public",
+        "internal",
+        "confidential",
+        "restricted",
+        "personal_data"
+      ],
+      "default": "none",
+      "description": "Type of data affected"
+    },
+    "regulatory_notification_required": {
+      "type": "boolean",
+      "default": false,
+      "description": "Whether regulatory notification is required"
+    },
+    "regulatory_notification_status": {
+      "type": "string",
+      "enum": [
+        "not_required",
+        "pending",
+        "submitted",
+        "acknowledged"
+      ],
+      "default": "not_required"
+    },
+    "root_cause": {
+      "type": "string",
+      "description": "Root cause analysis findings"
+    },
+    "remediation_actions": {
+      "type": "string",
+      "description": "Actions taken to remediate the incident"
+    },
+    "lessons_learned": {
+      "type": "string",
+      "description": "Key lessons learned from the incident"
+    },
+    "frameworks": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Applicable frameworks"
+    },
+    "linked_control_ids": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "IDs of linked Control records"
+    },
+    "linked_risk_ids": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "IDs of linked Risk records"
+    },
+    "linked_policy_ids": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "IDs of linked Policy records"
+    },
+    "linked_task_ids": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "IDs of linked Task records"
+    },
+    "linked_evidence_ids": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "IDs of linked Evidence records"
+    },
+    "linked_cmdb_ids": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "IDs of linked CMDB Item records"
+    },
+    "linked_vendor_ids": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "IDs of linked Vendor records"
+    },
+    "linked_obligation_ids": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "IDs of linked Obligation records"
+    },
+    "is_deleted": {
+      "type": "boolean",
+      "default": false,
+      "description": "Soft delete flag"
+    },
+    "deleted_date": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Date and time when deleted"
+    }
+  },
+  "required": [
+    "title",
+    "category",
+    "severity",
+    "status"
+  ]
+}

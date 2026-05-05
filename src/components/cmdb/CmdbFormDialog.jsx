@@ -22,7 +22,7 @@ const DEFAULT = {
   criticality: 'medium', environment: 'production', owner: '', location: '', vendor: '',
   version: '', ip_address: '', os: '', description: '', data_classification: 'internal',
   last_reviewed: '', decommission_date: '', notes: '',
-  linked_control_ids: [], linked_risk_ids: [], linked_task_ids: [], linked_evidence_ids: [], linked_vendor_ids: []
+  linked_control_ids: [], linked_risk_ids: [], linked_task_ids: [], linked_evidence_ids: [], linked_vendor_ids: [], linked_policy_ids: [], linked_obligation_ids: [], linked_incident_ids: []
 };
 
 export default function CmdbFormDialog({ open, onOpenChange, item, onSave, saving }) {
@@ -44,13 +44,16 @@ export default function CmdbFormDialog({ open, onOpenChange, item, onSave, savin
   const { data: tasks = [] } = useQuery({ queryKey: ['tasks'], queryFn: () => base44.entities.Task.list() });
   const { data: evidence = [] } = useQuery({ queryKey: ['evidence'], queryFn: () => base44.entities.Evidence.list() });
   const { data: vendors = [] } = useQuery({ queryKey: ['vendors'], queryFn: () => base44.entities.Vendor.list() });
+  const { data: policies = [] } = useQuery({ queryKey: ['policies'], queryFn: () => base44.entities.Policy.list() });
+  const { data: obligations = [] } = useQuery({ queryKey: ['obligations'], queryFn: () => base44.entities.Obligation.list() });
+  const { data: incidents = [] } = useQuery({ queryKey: ['incidents'], queryFn: () => base44.entities.Incident.list() });
 
   const set = (k, v) => setForm(f => ({ ...f, [k]: v }));
 
   const toggleLink = (field, id) => {
     setForm(f => ({
       ...f,
-      [field]: f[field].includes(id) ? f[field].filter(x => x !== id) : [...f[field], id]
+      [field]: f[field]?.includes(id) ? f[field].filter(x => x !== id) : [...(f[field] || []), id]
     }));
   };
 
@@ -209,6 +212,12 @@ export default function CmdbFormDialog({ open, onOpenChange, item, onSave, savin
                 renderLabel={e => e.title} renderSub={e => e.status} />
               <LinkSection label="Vendors" items={vendors} selected={form.linked_vendor_ids} onToggle={id => toggleLink('linked_vendor_ids', id)}
                 renderLabel={v => `${v.vendor_id ? v.vendor_id + ' – ' : ''}${v.name}`} renderSub={v => v.category?.replace(/_/g, ' ')} />
+              <LinkSection label="Policies" items={policies} selected={form.linked_policy_ids || []} onToggle={id => toggleLink('linked_policy_ids', id)}
+                renderLabel={p => `${p.policy_id ? p.policy_id + ' – ' : ''}${p.title}`} renderSub={p => p.status} />
+              <LinkSection label="Obligations" items={obligations} selected={form.linked_obligation_ids || []} onToggle={id => toggleLink('linked_obligation_ids', id)}
+                renderLabel={o => `${o.obligation_id ? o.obligation_id + ' – ' : ''}${o.title}`} renderSub={o => o.framework} />
+              <LinkSection label="Incidents" items={incidents} selected={form.linked_incident_ids || []} onToggle={id => toggleLink('linked_incident_ids', id)}
+                renderLabel={i => `${i.incident_id ? i.incident_id + ' – ' : ''}${i.title}`} renderSub={i => i.severity} />
             </TabsContent>
           </Tabs>
         </div>

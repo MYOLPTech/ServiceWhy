@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import {
-  LayoutDashboard, Shield, FileCheck, AlertTriangle,
+  LayoutDashboard, Shield, FileCheck, AlertTriangle, AlertOctagon,
   FileText, CheckSquare, ClipboardCheck, Settings, LogOut, ChevronLeft, ChevronRight, BookMarked, Database, Building, BarChart3
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -20,6 +20,7 @@ const navItems = [
   { icon: Building, label: 'Vendors', path: '/vendors' },
   { icon: FileCheck, label: 'Evidence', path: '/evidence' },
   { icon: CheckSquare, label: 'Tasks', path: '/tasks' },
+  { icon: AlertOctagon, label: 'Incidents', path: '/incidents' },
 ];
 
 export default function Sidebar() {

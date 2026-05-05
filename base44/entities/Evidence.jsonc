@@ -100,6 +100,13 @@
       },
       "description": "IDs of linked Obligation records"
     },
+    "linked_incident_ids": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "IDs of linked Incident records"
+    },
     "is_deleted": {
       "type": "boolean",
       "default": false,

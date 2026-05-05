@@ -17,6 +17,7 @@ import ObligationRegister from './pages/ObligationRegister';
 import Cmdb from './pages/Cmdb';
 import Vendors from './pages/Vendors';
 import Reports from './pages/Reports';
+import Incidents from './pages/Incidents';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
@@ -56,6 +57,7 @@ const AuthenticatedApp = () => {
         <Route path="/cmdb" element={<Cmdb />} />
         <Route path="/vendors" element={<Vendors />} />
         <Route path="/reports" element={<Reports />} />
+        <Route path="/incidents" element={<Incidents />} />
       </Route>
       <Route path="*" element={<PageNotFound />} />
     </Routes>

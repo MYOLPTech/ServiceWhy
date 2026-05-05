@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -7,6 +8,7 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { base44 } from '@/api/base44Client';
 import { X } from 'lucide-react';
+import LinkedRecords from '../shared/LinkedRecords';
 
 const emptyControl = {
   control_id: '', title: '', description: '', framework: 'SOC2', category: '',
@@ -14,7 +16,8 @@ const emptyControl = {
   evidence_required: '', target_date: '', implementation_type: 'manual',
   implementation_overview: '', implementation_steps: [], automation_details: '',
   manual_procedures: '', best_practices: [], common_pitfalls: [], 
-  tools_and_systems: [], testing_and_validation: '', frequency: ''
+  tools_and_systems: [], testing_and_validation: '', frequency: '',
+  linked_risk_ids: [], linked_policy_ids: [], linked_task_ids: [], linked_evidence_ids: [], linked_cmdb_ids: [], linked_vendor_ids: [], linked_obligation_ids: [], linked_incident_ids: []
 };
 
 function generateNextId(records, field, prefix) {
@@ -43,6 +46,19 @@ export default function ControlFormDialog({ open, onOpenChange, control, onSave,
     e.preventDefault();
     onSave(form);
   };
+
+  const toggleLink = (field, id) => {
+    setForm(f => ({ ...f, [field]: f[field]?.includes(id) ? f[field].filter(x => x !== id) : [...(f[field] || []), id] }));
+  };
+
+  const { data: risks = [] } = useQuery({ queryKey: ['risks'], queryFn: () => base44.entities.Risk.list() });
+  const { data: policies = [] } = useQuery({ queryKey: ['policies'], queryFn: () => base44.entities.Policy.list() });
+  const { data: tasks = [] } = useQuery({ queryKey: ['tasks'], queryFn: () => base44.entities.Task.list() });
+  const { data: evidence = [] } = useQuery({ queryKey: ['evidence'], queryFn: () => base44.entities.Evidence.list() });
+  const { data: cmdb = [] } = useQuery({ queryKey: ['cmdb'], queryFn: () => base44.entities.CmdbItem.list() });
+  const { data: vendors = [] } = useQuery({ queryKey: ['vendors'], queryFn: () => base44.entities.Vendor.list() });
+  const { data: obligations = [] } = useQuery({ queryKey: ['obligations'], queryFn: () => base44.entities.Obligation.list() });
+  const { data: incidents = [] } = useQuery({ queryKey: ['incidents'], queryFn: () => base44.entities.Incident.list() });
 
   const addStep = () => {
     const steps = form.implementation_steps || [];
@@ -85,9 +101,9 @@ export default function ControlFormDialog({ open, onOpenChange, control, onSave,
 
          {/* Tabs */}
          <div className="flex gap-1 border-b border-border">
-          {['basic', 'implementation', 'details'].map(t => (
+          {['basic', 'implementation', 'details', 'links'].map(t => (
             <button key={t} type="button" onClick={() => setTab(t)} className={`px-3 py-2 text-xs font-semibold rounded-t border-b-2 transition-colors ${tab === t ? 'border-primary text-primary' : 'border-transparent text-muted-foreground hover:text-foreground'}`}>
-              {t === 'basic' && 'Basic'}{t === 'implementation' && 'Implementation'}{t === 'details' && 'Details'}
+              {t === 'basic' && 'Basic'}{t === 'implementation' && 'Implementation'}{t === 'details' && 'Details'}{t === 'links' && 'Linked Records'}
             </button>
           ))}
          </div>
@@ -198,6 +214,27 @@ export default function ControlFormDialog({ open, onOpenChange, control, onSave,
                  </div>
                )}
              </>
+           )}
+
+           {tab === 'links' && (
+             <div className="space-y-6 max-h-[60vh] overflow-y-auto pr-2">
+               <LinkedRecords label="Risks" items={risks} selected={form.linked_risk_ids || []} onToggle={id => toggleLink('linked_risk_ids', id)}
+                 renderLabel={r => `${r.risk_id ? r.risk_id + ' – ' : ''}${r.title}`} renderSub={r => r.category} />
+               <LinkedRecords label="Policies" items={policies} selected={form.linked_policy_ids || []} onToggle={id => toggleLink('linked_policy_ids', id)}
+                 renderLabel={p => `${p.policy_id ? p.policy_id + ' – ' : ''}${p.title}`} renderSub={p => p.status} />
+               <LinkedRecords label="Tasks" items={tasks} selected={form.linked_task_ids || []} onToggle={id => toggleLink('linked_task_ids', id)}
+                 renderLabel={t => `${t.task_id ? t.task_id + ' – ' : ''}${t.title}`} renderSub={t => t.status} />
+               <LinkedRecords label="Evidence" items={evidence} selected={form.linked_evidence_ids || []} onToggle={id => toggleLink('linked_evidence_ids', id)}
+                 renderLabel={e => e.title} renderSub={e => e.status} />
+               <LinkedRecords label="CMDB Items" items={cmdb} selected={form.linked_cmdb_ids || []} onToggle={id => toggleLink('linked_cmdb_ids', id)}
+                 renderLabel={c => `${c.asset_id ? c.asset_id + ' – ' : ''}${c.name}`} renderSub={c => c.type} />
+               <LinkedRecords label="Vendors" items={vendors} selected={form.linked_vendor_ids || []} onToggle={id => toggleLink('linked_vendor_ids', id)}
+                 renderLabel={v => `${v.vendor_id ? v.vendor_id + ' – ' : ''}${v.name}`} renderSub={v => v.category} />
+               <LinkedRecords label="Obligations" items={obligations} selected={form.linked_obligation_ids || []} onToggle={id => toggleLink('linked_obligation_ids', id)}
+                 renderLabel={o => `${o.obligation_id ? o.obligation_id + ' – ' : ''}${o.title}`} renderSub={o => o.framework} />
+               <LinkedRecords label="Incidents" items={incidents} selected={form.linked_incident_ids || []} onToggle={id => toggleLink('linked_incident_ids', id)}
+                 renderLabel={i => `${i.incident_id ? i.incident_id + ' – ' : ''}${i.title}`} renderSub={i => i.severity} />
+             </div>
            )}
 
            {tab === 'details' && (

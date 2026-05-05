@@ -15,7 +15,7 @@ const emptyRisk = {
   risk_id: '', title: '', description: '', category: 'operational', likelihood: 3, impact: 3,
   risk_score: 9, treatment: 'mitigate', treatment_plan: '', status: 'open', owner: '',
   frameworks: ['SOC2', 'ASAE3150', 'ISO27001', 'ISO27017', 'ISO27018'],
-  linked_control_ids: [], linked_policy_ids: [], linked_task_ids: [], linked_evidence_ids: [], linked_cmdb_ids: [], linked_vendor_ids: [], linked_obligation_ids: []
+  linked_control_ids: [], linked_policy_ids: [], linked_task_ids: [], linked_evidence_ids: [], linked_cmdb_ids: [], linked_vendor_ids: [], linked_obligation_ids: [], linked_incident_ids: []
 };
 
 function generateNextId(records, field, prefix) {
@@ -47,6 +47,7 @@ export default function RiskFormDialog({ open, onOpenChange, risk, onSave, savin
   const { data: cmdb = [] } = useQuery({ queryKey: ['cmdb'], queryFn: () => base44.entities.CmdbItem.list() });
   const { data: vendors = [] } = useQuery({ queryKey: ['vendors'], queryFn: () => base44.entities.Vendor.list() });
   const { data: obligations = [] } = useQuery({ queryKey: ['obligations'], queryFn: () => base44.entities.Obligation.list() });
+  const { data: incidents = [] } = useQuery({ queryKey: ['incidents'], queryFn: () => base44.entities.Incident.list() });
 
   const toggleLink = (field, id) => {
     setForm(f => ({
@@ -180,6 +181,8 @@ export default function RiskFormDialog({ open, onOpenChange, risk, onSave, savin
              renderLabel={v => `${v.vendor_id ? v.vendor_id + ' – ' : ''}${v.name}`} renderSub={v => v.category} />
            <LinkedRecords label="Obligations" items={obligations} selected={form.linked_obligation_ids || []} onToggle={id => toggleLink('linked_obligation_ids', id)}
              renderLabel={o => `${o.obligation_id ? o.obligation_id + ' – ' : ''}${o.title}`} renderSub={o => o.framework} />
+           <LinkedRecords label="Incidents" items={incidents} selected={form.linked_incident_ids || []} onToggle={id => toggleLink('linked_incident_ids', id)}
+             renderLabel={i => `${i.incident_id ? i.incident_id + ' – ' : ''}${i.title}`} renderSub={i => i.severity} />
           </div>
           )}
           <div className="flex justify-end gap-3 pt-2 border-t">

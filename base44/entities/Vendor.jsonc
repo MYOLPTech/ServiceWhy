@@ -355,6 +355,41 @@
       },
       "description": "IDs of linked Task records"
     },
+    "linked_policy_ids": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "IDs of linked Policy records"
+    },
+    "linked_evidence_ids": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "IDs of linked Evidence records"
+    },
+    "linked_cmdb_ids": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "IDs of linked CMDB Item records"
+    },
+    "linked_obligation_ids": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "IDs of linked Obligation records"
+    },
+    "linked_incident_ids": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "IDs of linked Incident records"
+    },
     "is_deleted": {
       "type": "boolean",
       "default": false,

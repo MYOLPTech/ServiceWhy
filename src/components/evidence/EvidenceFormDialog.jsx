@@ -14,7 +14,7 @@ import LinkedRecords from '../shared/LinkedRecords';
 const emptyEvidence = {
   evidence_id: '', title: '', description: '', control_id: '', framework: '', file_url: '', file_name: '',
   status: 'pending_review', review_notes: '', expiry_date: '',
-  linked_control_ids: [], linked_risk_ids: [], linked_policy_ids: [], linked_task_ids: [], linked_cmdb_ids: [], linked_vendor_ids: [], linked_obligation_ids: []
+  linked_control_ids: [], linked_risk_ids: [], linked_policy_ids: [], linked_task_ids: [], linked_cmdb_ids: [], linked_vendor_ids: [], linked_obligation_ids: [], linked_incident_ids: []
 };
 
 export default function EvidenceFormDialog({ open, onOpenChange, evidence, controls, onSave, saving }) {
@@ -36,6 +36,7 @@ export default function EvidenceFormDialog({ open, onOpenChange, evidence, contr
   const { data: cmdb = [] } = useQuery({ queryKey: ['cmdb'], queryFn: () => base44.entities.CmdbItem.list() });
   const { data: vendors = [] } = useQuery({ queryKey: ['vendors'], queryFn: () => base44.entities.Vendor.list() });
   const { data: obligations = [] } = useQuery({ queryKey: ['obligations'], queryFn: () => base44.entities.Obligation.list() });
+  const { data: incidents = [] } = useQuery({ queryKey: ['incidents'], queryFn: () => base44.entities.Incident.list() });
 
   const toggleLink = (field, id) => {
     setForm(f => ({
@@ -139,6 +140,8 @@ export default function EvidenceFormDialog({ open, onOpenChange, evidence, contr
               renderLabel={v => `${v.vendor_id ? v.vendor_id + ' – ' : ''}${v.name}`} renderSub={v => v.category} />
             <LinkedRecords label="Obligations" items={obligations} selected={form.linked_obligation_ids || []} onToggle={id => toggleLink('linked_obligation_ids', id)}
               renderLabel={o => `${o.obligation_id ? o.obligation_id + ' – ' : ''}${o.title}`} renderSub={o => o.framework} />
+            <LinkedRecords label="Incidents" items={incidents} selected={form.linked_incident_ids || []} onToggle={id => toggleLink('linked_incident_ids', id)}
+              renderLabel={i => `${i.incident_id ? i.incident_id + ' – ' : ''}${i.title}`} renderSub={i => i.severity} />
           </TabsContent>
           </div>
           </Tabs>
