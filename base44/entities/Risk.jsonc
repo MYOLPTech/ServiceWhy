@@ -1,0 +1,75 @@
+{
+  "name": "Risk",
+  "type": "object",
+  "properties": {
+    "title": {
+      "type": "string",
+      "description": "Risk title"
+    },
+    "description": {
+      "type": "string"
+    },
+    "category": {
+      "type": "string",
+      "enum": [
+        "operational",
+        "technical",
+        "organizational",
+        "legal",
+        "physical",
+        "third_party"
+      ],
+      "default": "operational"
+    },
+    "likelihood": {
+      "type": "number",
+      "description": "Likelihood score 1-5"
+    },
+    "impact": {
+      "type": "number",
+      "description": "Impact score 1-5"
+    },
+    "risk_score": {
+      "type": "number",
+      "description": "Calculated risk score"
+    },
+    "treatment": {
+      "type": "string",
+      "enum": [
+        "mitigate",
+        "accept",
+        "transfer",
+        "avoid"
+      ],
+      "default": "mitigate"
+    },
+    "treatment_plan": {
+      "type": "string"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "open",
+        "in_treatment",
+        "closed",
+        "accepted"
+      ],
+      "default": "open"
+    },
+    "owner": {
+      "type": "string"
+    },
+    "frameworks": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Applicable frameworks"
+    }
+  },
+  "required": [
+    "title",
+    "likelihood",
+    "impact"
+  ]
+}

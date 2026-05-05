@@ -1,0 +1,68 @@
+{
+  "name": "Task",
+  "type": "object",
+  "properties": {
+    "title": {
+      "type": "string"
+    },
+    "description": {
+      "type": "string"
+    },
+    "type": {
+      "type": "string",
+      "enum": [
+        "remediation",
+        "implementation",
+        "review",
+        "documentation",
+        "training",
+        "audit_prep"
+      ],
+      "default": "implementation"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "todo",
+        "in_progress",
+        "blocked",
+        "completed"
+      ],
+      "default": "todo"
+    },
+    "priority": {
+      "type": "string",
+      "enum": [
+        "critical",
+        "high",
+        "medium",
+        "low"
+      ],
+      "default": "medium"
+    },
+    "assignee": {
+      "type": "string"
+    },
+    "framework": {
+      "type": "string",
+      "enum": [
+        "SOC2",
+        "ASAE3150",
+        "ISO27001",
+        "All"
+      ]
+    },
+    "linked_control_id": {
+      "type": "string",
+      "description": "ID of linked control"
+    },
+    "due_date": {
+      "type": "string",
+      "format": "date"
+    }
+  },
+  "required": [
+    "title",
+    "status"
+  ]
+}

@@ -1,0 +1,53 @@
+{
+  "name": "Evidence",
+  "type": "object",
+  "properties": {
+    "title": {
+      "type": "string",
+      "description": "Evidence title"
+    },
+    "description": {
+      "type": "string"
+    },
+    "control_id": {
+      "type": "string",
+      "description": "ID of the linked control record"
+    },
+    "framework": {
+      "type": "string",
+      "enum": [
+        "SOC2",
+        "ASAE3150",
+        "ISO27001"
+      ]
+    },
+    "file_url": {
+      "type": "string",
+      "description": "URL of uploaded evidence file"
+    },
+    "file_name": {
+      "type": "string"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "pending_review",
+        "approved",
+        "rejected",
+        "expired"
+      ],
+      "default": "pending_review"
+    },
+    "review_notes": {
+      "type": "string"
+    },
+    "expiry_date": {
+      "type": "string",
+      "format": "date"
+    }
+  },
+  "required": [
+    "title",
+    "control_id"
+  ]
+}

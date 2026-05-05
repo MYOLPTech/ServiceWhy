@@ -1,0 +1,72 @@
+{
+  "name": "Policy",
+  "type": "object",
+  "properties": {
+    "title": {
+      "type": "string"
+    },
+    "description": {
+      "type": "string"
+    },
+    "category": {
+      "type": "string",
+      "enum": [
+        "information_security",
+        "access_control",
+        "data_protection",
+        "incident_response",
+        "business_continuity",
+        "change_management",
+        "vendor_management",
+        "acceptable_use",
+        "hr_security",
+        "physical_security",
+        "other"
+      ],
+      "default": "information_security"
+    },
+    "version": {
+      "type": "string",
+      "default": "1.0"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "draft",
+        "in_review",
+        "approved",
+        "published",
+        "retired"
+      ],
+      "default": "draft"
+    },
+    "owner": {
+      "type": "string"
+    },
+    "approver": {
+      "type": "string"
+    },
+    "file_url": {
+      "type": "string"
+    },
+    "frameworks": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Applicable frameworks"
+    },
+    "review_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "approved_date": {
+      "type": "string",
+      "format": "date"
+    }
+  },
+  "required": [
+    "title",
+    "status"
+  ]
+}

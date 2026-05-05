@@ -1,0 +1,74 @@
+{
+  "name": "Control",
+  "type": "object",
+  "properties": {
+    "control_id": {
+      "type": "string",
+      "description": "Unique control identifier (e.g., CC1.1, A.5.1)"
+    },
+    "title": {
+      "type": "string",
+      "description": "Control title"
+    },
+    "description": {
+      "type": "string",
+      "description": "Full control description"
+    },
+    "framework": {
+      "type": "string",
+      "enum": [
+        "SOC2",
+        "ASAE3150",
+        "ISO27001"
+      ],
+      "description": "Which framework this control belongs to"
+    },
+    "category": {
+      "type": "string",
+      "description": "Control category/domain"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "not_started",
+        "in_progress",
+        "implemented",
+        "verified",
+        "not_applicable"
+      ],
+      "default": "not_started",
+      "description": "Implementation status"
+    },
+    "priority": {
+      "type": "string",
+      "enum": [
+        "critical",
+        "high",
+        "medium",
+        "low"
+      ],
+      "default": "medium"
+    },
+    "owner": {
+      "type": "string",
+      "description": "Person responsible for this control"
+    },
+    "implementation_notes": {
+      "type": "string",
+      "description": "Notes on how this control is implemented"
+    },
+    "evidence_required": {
+      "type": "string",
+      "description": "Description of evidence needed"
+    },
+    "target_date": {
+      "type": "string",
+      "format": "date"
+    }
+  },
+  "required": [
+    "title",
+    "framework",
+    "status"
+  ]
+}
