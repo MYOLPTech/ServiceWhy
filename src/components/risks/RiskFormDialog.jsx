@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -6,12 +7,15 @@ import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Slider } from '@/components/ui/slider';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { base44 } from '@/api/base44Client';
+import LinkedRecords from '../shared/LinkedRecords';
 
 const emptyRisk = {
   risk_id: '', title: '', description: '', category: 'operational', likelihood: 3, impact: 3,
   risk_score: 9, treatment: 'mitigate', treatment_plan: '', status: 'open', owner: '',
-  frameworks: ['SOC2', 'ASAE3150', 'ISO27001', 'ISO27017', 'ISO27018']
+  frameworks: ['SOC2', 'ASAE3150', 'ISO27001', 'ISO27017', 'ISO27018'],
+  linked_control_ids: [], linked_policy_ids: [], linked_task_ids: [], linked_evidence_ids: [], linked_cmdb_ids: [], linked_vendor_ids: [], linked_obligation_ids: []
 };
 
 function generateNextId(records, field, prefix) {
@@ -22,9 +26,11 @@ function generateNextId(records, field, prefix) {
 
 export default function RiskFormDialog({ open, onOpenChange, risk, onSave, saving }) {
   const [form, setForm] = useState(emptyRisk);
+  const [tab, setTab] = useState('details');
 
   useEffect(() => {
     if (!open) return;
+    setTab('details');
     if (risk) {
       setForm({ ...emptyRisk, ...risk });
     } else {
@@ -33,6 +39,21 @@ export default function RiskFormDialog({ open, onOpenChange, risk, onSave, savin
       });
     }
   }, [risk, open]);
+
+  const { data: controls = [] } = useQuery({ queryKey: ['controls'], queryFn: () => base44.entities.Control.list() });
+  const { data: policies = [] } = useQuery({ queryKey: ['policies'], queryFn: () => base44.entities.Policy.list() });
+  const { data: tasks = [] } = useQuery({ queryKey: ['tasks'], queryFn: () => base44.entities.Task.list() });
+  const { data: evidence = [] } = useQuery({ queryKey: ['evidence'], queryFn: () => base44.entities.Evidence.list() });
+  const { data: cmdb = [] } = useQuery({ queryKey: ['cmdb'], queryFn: () => base44.entities.CmdbItem.list() });
+  const { data: vendors = [] } = useQuery({ queryKey: ['vendors'], queryFn: () => base44.entities.Vendor.list() });
+  const { data: obligations = [] } = useQuery({ queryKey: ['obligations'], queryFn: () => base44.entities.Obligation.list() });
+
+  const toggleLink = (field, id) => {
+    setForm(f => ({
+      ...f,
+      [field]: f[field]?.includes(id) ? f[field].filter(x => x !== id) : [...(f[field] || []), id]
+    }));
+  };
 
   const updateScore = (field, val) => {
     const updated = { ...form, [field]: val };
@@ -53,7 +74,11 @@ export default function RiskFormDialog({ open, onOpenChange, risk, onSave, savin
         <DialogHeader>
           <DialogTitle>{risk ? 'Edit Risk' : 'Add Risk'}</DialogTitle>
         </DialogHeader>
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <TabsList className="mb-4 w-fit">
+          <TabsTrigger value="details" onClick={() => setTab('details')}>Details</TabsTrigger>
+          <TabsTrigger value="links" onClick={() => setTab('links')}>Linked Records</TabsTrigger>
+        </TabsList>
+        <form onSubmit={handleSubmit} className={tab === 'details' ? 'space-y-4' : 'hidden'}>
           <div className="grid grid-cols-3 gap-4">
             <div>
               <Label>Risk ID</Label>
@@ -136,8 +161,30 @@ export default function RiskFormDialog({ open, onOpenChange, risk, onSave, savin
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>Cancel</Button>
             <Button type="submit" disabled={saving}>{saving ? 'Saving...' : 'Save Risk'}</Button>
           </div>
-        </form>
-      </DialogContent>
-    </Dialog>
-  );
-}
+          </form>
+          {tab === 'links' && (
+          <div className="space-y-6 overflow-y-auto pr-2">
+           <LinkedRecords label="Controls" items={controls} selected={form.linked_control_ids || []} onToggle={id => toggleLink('linked_control_ids', id)}
+             renderLabel={c => `${c.control_id ? c.control_id + ' – ' : ''}${c.title}`} renderSub={c => c.framework} />
+           <LinkedRecords label="Policies" items={policies} selected={form.linked_policy_ids || []} onToggle={id => toggleLink('linked_policy_ids', id)}
+             renderLabel={p => `${p.policy_id ? p.policy_id + ' – ' : ''}${p.title}`} renderSub={p => p.status} />
+           <LinkedRecords label="Tasks" items={tasks} selected={form.linked_task_ids || []} onToggle={id => toggleLink('linked_task_ids', id)}
+             renderLabel={t => `${t.task_id ? t.task_id + ' – ' : ''}${t.title}`} renderSub={t => t.status} />
+           <LinkedRecords label="Evidence" items={evidence} selected={form.linked_evidence_ids || []} onToggle={id => toggleLink('linked_evidence_ids', id)}
+             renderLabel={e => e.title} renderSub={e => e.status} />
+           <LinkedRecords label="CMDB Items" items={cmdb} selected={form.linked_cmdb_ids || []} onToggle={id => toggleLink('linked_cmdb_ids', id)}
+             renderLabel={c => `${c.asset_id ? c.asset_id + ' – ' : ''}${c.name}`} renderSub={c => c.type} />
+           <LinkedRecords label="Vendors" items={vendors} selected={form.linked_vendor_ids || []} onToggle={id => toggleLink('linked_vendor_ids', id)}
+             renderLabel={v => `${v.vendor_id ? v.vendor_id + ' – ' : ''}${v.name}`} renderSub={v => v.category} />
+           <LinkedRecords label="Obligations" items={obligations} selected={form.linked_obligation_ids || []} onToggle={id => toggleLink('linked_obligation_ids', id)}
+             renderLabel={o => `${o.obligation_id ? o.obligation_id + ' – ' : ''}${o.title}`} renderSub={o => o.framework} />
+          </div>
+          )}
+          <div className="flex justify-end gap-3 pt-2 border-t">
+          <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>Cancel</Button>
+          <Button type="submit" form="risk-form" disabled={saving}>{saving ? 'Saving...' : 'Save Risk'}</Button>
+          </div>
+          </DialogContent>
+          </Dialog>
+          );
+          }

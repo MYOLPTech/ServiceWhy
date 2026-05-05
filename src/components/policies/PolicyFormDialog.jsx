@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 
 import { Button } from '@/components/ui/button';
@@ -7,14 +8,16 @@ import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { base44 } from '@/api/base44Client';
+import { Upload } from 'lucide-react';
+import LinkedRecords from '../shared/LinkedRecords';
 
 function generateNextId(records, field, prefix) {
   const nums = records.map(r => parseInt((r[field] || '').replace(prefix + '-', ''), 10)).filter(n => !isNaN(n));
   const next = nums.length > 0 ? Math.max(...nums) + 1 : 1;
   return `${prefix}-${String(next).padStart(3, '0')}`;
 }
-import { Upload } from 'lucide-react';
 
 const categories = [
   { value: 'information_security', label: 'Information Security' },
@@ -40,7 +43,8 @@ const frameworkOptions = ['SOC2', 'ASAE3150', 'ISO27001', 'ISO27017', 'ISO27018'
 const emptyPolicy = {
   policy_id: '', title: '', description: '', category: 'information_security', version: '1.0',
   status: 'draft', owner: '', approver: '', file_url: '', policy_content: '',
-  frameworks: [], review_date: '', approved_date: ''
+  frameworks: [], review_date: '', approved_date: '',
+  linked_control_ids: [], linked_risk_ids: [], linked_task_ids: [], linked_evidence_ids: [], linked_cmdb_ids: [], linked_vendor_ids: [], linked_obligation_ids: []
 };
 
 export default function PolicyFormDialog({ open, onOpenChange, policy, onSave, saving }) {
@@ -60,10 +64,25 @@ export default function PolicyFormDialog({ open, onOpenChange, policy, onSave, s
     }
   }, [policy, open]);
 
+  const { data: controls = [] } = useQuery({ queryKey: ['controls'], queryFn: () => base44.entities.Control.list() });
+  const { data: risks = [] } = useQuery({ queryKey: ['risks'], queryFn: () => base44.entities.Risk.list() });
+  const { data: tasks = [] } = useQuery({ queryKey: ['tasks'], queryFn: () => base44.entities.Task.list() });
+  const { data: evidence = [] } = useQuery({ queryKey: ['evidence'], queryFn: () => base44.entities.Evidence.list() });
+  const { data: cmdb = [] } = useQuery({ queryKey: ['cmdb'], queryFn: () => base44.entities.CmdbItem.list() });
+  const { data: vendors = [] } = useQuery({ queryKey: ['vendors'], queryFn: () => base44.entities.Vendor.list() });
+  const { data: obligations = [] } = useQuery({ queryKey: ['obligations'], queryFn: () => base44.entities.Obligation.list() });
+
   const toggleFramework = (fw) => {
     setForm(f => ({
       ...f,
       frameworks: f.frameworks.includes(fw) ? f.frameworks.filter(x => x !== fw) : [...f.frameworks, fw]
+    }));
+  };
+
+  const toggleLink = (field, id) => {
+    setForm(f => ({
+      ...f,
+      [field]: f[field]?.includes(id) ? f[field].filter(x => x !== id) : [...(f[field] || []), id]
     }));
   };
 
@@ -90,7 +109,7 @@ export default function PolicyFormDialog({ open, onOpenChange, policy, onSave, s
 
         {/* Tabs */}
         <div className="flex gap-1 border-b border-border mb-4">
-          {['details', 'content'].map(t => (
+          {['details', 'content', 'links'].map(t => (
             <button
               key={t}
               type="button"
@@ -99,7 +118,7 @@ export default function PolicyFormDialog({ open, onOpenChange, policy, onSave, s
                 tab === t ? 'border-primary text-primary' : 'border-transparent text-muted-foreground hover:text-foreground'
               }`}
             >
-              {t === 'content' ? 'Policy Document' : 'Details'}
+              {t === 'content' ? 'Policy Document' : t === 'links' ? 'Linked Records' : 'Details'}
             </button>
           ))}
         </div>
@@ -191,6 +210,25 @@ export default function PolicyFormDialog({ open, onOpenChange, policy, onSave, s
                 className="font-mono text-xs"
                 placeholder="<h1>Policy Title</h1>&#10;<h2>1. Purpose</h2>&#10;<p>This policy...</p>"
               />
+            </div>
+          )}
+
+          {tab === 'links' && (
+            <div className="space-y-6 overflow-y-auto pr-2">
+              <LinkedRecords label="Controls" items={controls} selected={form.linked_control_ids || []} onToggle={id => toggleLink('linked_control_ids', id)}
+                renderLabel={c => `${c.control_id ? c.control_id + ' – ' : ''}${c.title}`} renderSub={c => c.framework} />
+              <LinkedRecords label="Risks" items={risks} selected={form.linked_risk_ids || []} onToggle={id => toggleLink('linked_risk_ids', id)}
+                renderLabel={r => `${r.risk_id ? r.risk_id + ' – ' : ''}${r.title}`} renderSub={r => r.category} />
+              <LinkedRecords label="Tasks" items={tasks} selected={form.linked_task_ids || []} onToggle={id => toggleLink('linked_task_ids', id)}
+                renderLabel={t => `${t.task_id ? t.task_id + ' – ' : ''}${t.title}`} renderSub={t => t.status} />
+              <LinkedRecords label="Evidence" items={evidence} selected={form.linked_evidence_ids || []} onToggle={id => toggleLink('linked_evidence_ids', id)}
+                renderLabel={e => e.title} renderSub={e => e.status} />
+              <LinkedRecords label="CMDB Items" items={cmdb} selected={form.linked_cmdb_ids || []} onToggle={id => toggleLink('linked_cmdb_ids', id)}
+                renderLabel={c => `${c.asset_id ? c.asset_id + ' – ' : ''}${c.name}`} renderSub={c => c.type} />
+              <LinkedRecords label="Vendors" items={vendors} selected={form.linked_vendor_ids || []} onToggle={id => toggleLink('linked_vendor_ids', id)}
+                renderLabel={v => `${v.vendor_id ? v.vendor_id + ' – ' : ''}${v.name}`} renderSub={v => v.category} />
+              <LinkedRecords label="Obligations" items={obligations} selected={form.linked_obligation_ids || []} onToggle={id => toggleLink('linked_obligation_ids', id)}
+                renderLabel={o => `${o.obligation_id ? o.obligation_id + ' – ' : ''}${o.title}`} renderSub={o => o.framework} />
             </div>
           )}
 
