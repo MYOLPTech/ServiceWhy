@@ -26,9 +26,7 @@ Deno.serve(async (req) => {
 
     for (const entityName of entities) {
       try {
-        const schema = await base44.entities[entityName].schema();
         const records = await base44.entities[entityName].list();
-        
         allData[entityName] = records;
 
         // Generate CREATE TABLE statement
@@ -41,11 +39,14 @@ Deno.serve(async (req) => {
         columns.push('  updated_date TIMESTAMP WITH TIME ZONE');
         columns.push('  created_by TEXT');
 
-        // Add schema properties
-        if (schema && schema.properties) {
-          for (const [prop, def] of Object.entries(schema.properties)) {
-            const colType = getPostgresType(def);
-            columns.push(`  ${prop} ${colType}`);
+        // Extract columns from first record if available
+        if (records.length > 0) {
+          const firstRecord = records[0];
+          for (const [prop, value] of Object.entries(firstRecord)) {
+            if (!['id', 'created_date', 'updated_date', 'created_by'].includes(prop)) {
+              const colType = getPostgresTypeFromValue(value);
+              columns.push(`  "${prop}" ${colType}`);
+            }
           }
         }
 
@@ -150,7 +151,7 @@ async function uploadFilesToGithub(accessToken, files) {
       // Upload/update file
       const uploadPayload = {
         message: `[DATAPUMP] ${path}`,
-        content: btoa(content),
+        content: btoa(unescape(encodeURIComponent(content))),
         ...(sha && { sha })
       };
 
@@ -177,18 +178,17 @@ async function uploadFilesToGithub(accessToken, files) {
   }
 }
 
-function getPostgresType(definition) {
-  if (!definition) return 'TEXT';
+function getPostgresTypeFromValue(value) {
+  if (value === null || value === undefined) return 'TEXT';
   
-  const type = definition.type;
-  const format = definition.format;
-
-  if (type === 'boolean') return 'BOOLEAN';
-  if (type === 'integer' || type === 'number') return 'NUMERIC';
-  if (type === 'array') return 'JSONB';
-  if (type === 'object') return 'JSONB';
-  if (format === 'date') return 'DATE';
-  if (format === 'date-time') return 'TIMESTAMP WITH TIME ZONE';
+  if (typeof value === 'boolean') return 'BOOLEAN';
+  if (typeof value === 'number') return 'NUMERIC';
+  if (Array.isArray(value)) return 'JSONB';
+  if (typeof value === 'object') return 'JSONB';
+  
+  const str = String(value);
+  if (/^\d{4}-\d{2}-\d{2}$/.test(str)) return 'DATE';
+  if (/^\d{4}-\d{2}-\d{2}T/.test(str)) return 'TIMESTAMP WITH TIME ZONE';
   
   return 'TEXT';
 }
