@@ -9,7 +9,7 @@ import { base44 } from '@/api/base44Client';
 import { Upload } from 'lucide-react';
 
 const emptyEvidence = {
-  title: '', description: '', control_id: '', framework: '', file_url: '', file_name: '',
+  evidence_id: '', title: '', description: '', control_id: '', framework: '', file_url: '', file_name: '',
   status: 'pending_review', review_notes: '', expiry_date: ''
 };
 
@@ -18,7 +18,11 @@ export default function EvidenceFormDialog({ open, onOpenChange, evidence, contr
   const [uploading, setUploading] = useState(false);
 
   useEffect(() => {
-    setForm(evidence ? { ...emptyEvidence, ...evidence } : emptyEvidence);
+    if (evidence) {
+      setForm({ ...emptyEvidence, ...evidence });
+    } else {
+      setForm(emptyEvidence);
+    }
   }, [evidence, open]);
 
   const handleFile = async (e) => {
@@ -42,28 +46,10 @@ export default function EvidenceFormDialog({ open, onOpenChange, evidence, contr
           <DialogTitle>{evidence ? 'Edit Evidence' : 'Upload Evidence'}</DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <Label>Title *</Label>
-            <Input value={form.title} onChange={e => setForm({...form, title: e.target.value})} required />
-          </div>
-          <div>
-            <Label>Description</Label>
-            <Textarea value={form.description} onChange={e => setForm({...form, description: e.target.value})} rows={2} />
-          </div>
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <Label>Linked Control</Label>
-              <Select value={form.control_id} onValueChange={v => {
-                const ctrl = controls.find(c => c.id === v);
-                setForm({...form, control_id: v, framework: ctrl?.framework || form.framework});
-              }}>
-                <SelectTrigger><SelectValue placeholder="Select control" /></SelectTrigger>
-                <SelectContent>
-                  {controls.map(c => (
-                    <SelectItem key={c.id} value={c.id}>{c.control_id || c.title}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <Label>Evidence ID</Label>
+              <Input value={form.evidence_id} onChange={e => setForm({...form, evidence_id: e.target.value})} placeholder="Auto-generated" disabled />
             </div>
             <div>
               <Label>Status</Label>
@@ -77,6 +63,28 @@ export default function EvidenceFormDialog({ open, onOpenChange, evidence, contr
                 </SelectContent>
               </Select>
             </div>
+          </div>
+          <div>
+            <Label>Title *</Label>
+            <Input value={form.title} onChange={e => setForm({...form, title: e.target.value})} required />
+          </div>
+          <div>
+            <Label>Description</Label>
+            <Textarea value={form.description} onChange={e => setForm({...form, description: e.target.value})} rows={2} />
+          </div>
+          <div>
+            <Label>Linked Control</Label>
+            <Select value={form.control_id} onValueChange={v => {
+              const ctrl = controls.find(c => c.id === v);
+              setForm({...form, control_id: v, framework: ctrl?.framework || form.framework});
+            }}>
+              <SelectTrigger><SelectValue placeholder="Select control" /></SelectTrigger>
+              <SelectContent>
+                {controls.map(c => (
+                  <SelectItem key={c.id} value={c.id}>{c.control_id || c.title}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
           <div>
             <Label>Upload File</Label>

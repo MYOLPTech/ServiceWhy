@@ -68,6 +68,13 @@ export default function Evidence() {
     return c ? (c.control_id || c.title) : '—';
   };
 
+  const generateEvidenceId = async () => {
+    const existing = await base44.entities.Evidence.list();
+    const ids = existing.map(e => parseInt(e.evidence_id?.split('-')[1] || 0)).filter(n => !isNaN(n));
+    const nextNum = Math.max(...ids, 0) + 1;
+    return `EVD-${String(nextNum).padStart(3, '0')}`;
+  };
+
   const filtered = evidence.filter(e => {
     const matchesSearch = !search || e.title?.toLowerCase().includes(search.toLowerCase());
     const matchesStatus = statusFilter === 'all' || e.status === statusFilter;
@@ -118,8 +125,8 @@ export default function Evidence() {
           <Table>
             <TableHeader>
               <TableRow className="bg-muted/30">
+                <TableHead className="cursor-pointer hover:bg-muted/50" onClick={() => handleSort('evidence_id')}>ID {sortBy === 'evidence_id' && (sortDir === 'asc' ? '↑' : '↓')}</TableHead>
                 <TableHead className="cursor-pointer hover:bg-muted/50" onClick={() => handleSort('title')}>Title {sortBy === 'title' && (sortDir === 'asc' ? '↑' : '↓')}</TableHead>
-                <TableHead className="cursor-pointer hover:bg-muted/50" onClick={() => handleSort('control_id')}>Linked Control {sortBy === 'control_id' && (sortDir === 'asc' ? '↑' : '↓')}</TableHead>
                 <TableHead className="cursor-pointer hover:bg-muted/50" onClick={() => handleSort('status')}>Status {sortBy === 'status' && (sortDir === 'asc' ? '↑' : '↓')}</TableHead>
                 <TableHead className="cursor-pointer hover:bg-muted/50" onClick={() => handleSort('created_date')}>Uploaded {sortBy === 'created_date' && (sortDir === 'asc' ? '↑' : '↓')}</TableHead>
                 <TableHead className="cursor-pointer hover:bg-muted/50" onClick={() => handleSort('expiry_date')}>Expiry {sortBy === 'expiry_date' && (sortDir === 'asc' ? '↑' : '↓')}</TableHead>
@@ -129,13 +136,13 @@ export default function Evidence() {
             <TableBody>
               {filtered.map(e => (
                 <TableRow key={e.id} className="hover:bg-muted/20 transition-colors">
+                  <TableCell className="text-sm font-mono text-primary">{e.evidence_id}</TableCell>
                   <TableCell>
                     <div>
                       <p className="text-sm font-medium">{e.title}</p>
                       {e.file_name && <p className="text-[11px] text-muted-foreground">{e.file_name}</p>}
                     </div>
                   </TableCell>
-                  <TableCell className="text-sm text-muted-foreground">{getControlName(e.control_id)}</TableCell>
                   <TableCell><StatusBadge status={e.status} /></TableCell>
                   <TableCell className="text-sm text-muted-foreground">{format(new Date(e.created_date), 'MMM d, yyyy')}</TableCell>
                   <TableCell className="text-sm text-muted-foreground">{e.expiry_date ? format(new Date(e.expiry_date), 'MMM d, yyyy') : '—'}</TableCell>

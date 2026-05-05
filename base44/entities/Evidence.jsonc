@@ -2,6 +2,10 @@
   "name": "Evidence",
   "type": "object",
   "properties": {
+    "evidence_id": {
+      "type": "string",
+      "description": "Unique evidence identifier (e.g. EVD-001)"
+    },
     "title": {
       "type": "string",
       "description": "Evidence title"
