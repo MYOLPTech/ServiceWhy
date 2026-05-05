@@ -59,7 +59,7 @@ export default function CmdbFormDialog({ open, onOpenChange, item, onSave, savin
         <DialogHeader>
           <DialogTitle>{item ? 'Edit CMDB Item' : 'New CMDB Item'}</DialogTitle>
         </DialogHeader>
-        <ScrollArea className="flex-1 pr-2">
+        <div className="flex-1 overflow-y-auto pr-2">
           <Tabs defaultValue="details">
             <TabsList className="mb-4">
               <TabsTrigger value="details">Asset Details</TabsTrigger>
@@ -208,7 +208,7 @@ export default function CmdbFormDialog({ open, onOpenChange, item, onSave, savin
                 renderLabel={e => e.title} renderSub={e => e.status} />
             </TabsContent>
           </Tabs>
-        </ScrollArea>
+        </div>
         <DialogFooter className="pt-4 border-t">
           <Button variant="outline" onClick={() => onOpenChange(false)}>Cancel</Button>
           <Button onClick={() => onSave(form)} disabled={saving || !form.name}>
