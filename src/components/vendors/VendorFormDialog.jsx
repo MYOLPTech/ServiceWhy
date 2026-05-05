@@ -397,10 +397,10 @@ export default function VendorFormDialog({ open, onOpenChange, vendor, onSave, s
                       <Select value={cert.name || 'SOC2 Type II'} onValueChange={v => updateCert(idx, 'name', v)}>
                         <SelectTrigger><SelectValue /></SelectTrigger>
                         <SelectContent>
-                          {['SOC2 Type I','SOC2 Type II','ISO27001','ISO27002','ISO9001','ASAE3150','GDPR','HIPAA','PCI-DSS','other'].map(c => (
-                            <SelectItem key={c} value={c}>{c}</SelectItem>
-                          ))}
-                        </SelectContent>
+                            {['SOC2 Type I','SOC2 Type II','ISO27001','ISO27002','ISO27017','ISO27018','ISO9001','ASAE3150','GDPR','HIPAA','PCI-DSS','other'].map(c => (
+                              <SelectItem key={c} value={c}>{c}</SelectItem>
+                            ))}
+                          </SelectContent>
                       </Select>
                       <Select value={cert.status || 'required'} onValueChange={v => updateCert(idx, 'status', v)}>
                         <SelectTrigger><SelectValue /></SelectTrigger>
