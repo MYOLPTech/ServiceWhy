@@ -2,6 +2,10 @@
   "name": "Policy",
   "type": "object",
   "properties": {
+    "policy_id": {
+      "type": "string",
+      "description": "Unique policy identifier (e.g. POL-001)"
+    },
     "title": {
       "type": "string"
     },
