@@ -120,12 +120,12 @@ async function uploadFilesToGithub(accessToken, files) {
     const userData = await userResp.json();
     const login = userData.login;
 
-    // Try to find the repo with "compliance" or similar in name, otherwise use first repo
-    const reposResp = await fetch(`https://api.github.com/user/repos?per_page=100`, {
+    // Find the most recently updated repo (likely the active one)
+    const reposResp = await fetch(`https://api.github.com/user/repos?per_page=100&sort=updated`, {
       headers: { Authorization: `token ${accessToken}` }
     });
     const repos = await reposResp.json();
-    let targetRepo = repos.find(r => r.name.toLowerCase().includes('compliance') || r.name.toLowerCase().includes('data')) || repos[0];
+    const targetRepo = repos[0];
 
     if (!targetRepo) {
       return { status: 'error', message: 'No repositories found' };
