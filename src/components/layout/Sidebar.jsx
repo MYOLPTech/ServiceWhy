@@ -18,6 +18,7 @@ const navItems = [
   { icon: Shield, label: 'Controls', path: '/controls' },
   { icon: Database, label: 'CMDB', path: '/cmdb' },
   { icon: Building, label: 'Vendors', path: '/vendors' },
+  { icon: FileCheck, label: 'Evidence', path: '/evidence' },
   { icon: CheckSquare, label: 'Tasks', path: '/tasks' },
 ];
 
