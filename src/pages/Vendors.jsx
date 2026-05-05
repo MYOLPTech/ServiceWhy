@@ -5,12 +5,13 @@ import PageHeader from '@/components/shared/PageHeader';
 import EmptyState from '@/components/shared/EmptyState';
 import StatusBadge from '@/components/shared/StatusBadge';
 import VendorFormDialog from '@/components/vendors/VendorFormDialog';
+import VendorDetailReport from '@/components/vendors/VendorDetailReport';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogTitle } from '@/components/ui/alert-dialog';
-import { Plus, Search, Trash2 } from 'lucide-react';
+import { Plus, Search, Trash2, Eye } from 'lucide-react';
 
 export default function Vendors() {
   const [search, setSearch] = useState('');
@@ -19,6 +20,8 @@ export default function Vendors() {
   const [editingVendor, setEditingVendor] = useState(null);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState(null);
+  const [reportOpen, setReportOpen] = useState(false);
+  const [reportVendor, setReportVendor] = useState(null);
   const queryClient = useQueryClient();
 
   const { data: vendors = [], isLoading } = useQuery({
@@ -152,6 +155,9 @@ export default function Vendors() {
                   <TableCell><StatusBadge status={v.compliance_status} /></TableCell>
                   <TableCell className="text-sm capitalize">{v.contract_status?.replace(/_/g, ' ')}</TableCell>
                   <TableCell className="text-right space-x-2">
+                    <Button size="sm" variant="ghost" onClick={() => { setReportVendor(v); setReportOpen(true); }}>
+                      <Eye className="w-4 h-4" />
+                    </Button>
                     <Button size="sm" variant="ghost" onClick={() => { setEditingVendor(v); setDialogOpen(true); }}>Edit</Button>
                     <Button size="sm" variant="ghost" text-destructive onClick={() => setDeleteTarget(v)}>
                       <Trash2 className="w-4 h-4" />
@@ -165,6 +171,8 @@ export default function Vendors() {
       )}
 
       <VendorFormDialog open={dialogOpen} onOpenChange={setDialogOpen} vendor={editingVendor} onSave={handleSave} saving={createMutation.isPending || updateMutation.isPending} />
+
+      <VendorDetailReport vendor={reportVendor} open={reportOpen} onOpenChange={setReportOpen} />
 
       <AlertDialog open={!!deleteTarget} onOpenChange={() => setDeleteTarget(null)}>
         <AlertDialogContent>

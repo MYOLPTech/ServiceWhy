@@ -75,15 +75,16 @@ export default function VendorFormDialog({ open, onOpenChange, vendor, onSave, s
         <DialogHeader>
           <DialogTitle>{vendor ? 'Edit Vendor' : 'New Vendor'}</DialogTitle>
         </DialogHeader>
-        <div className="flex-1 overflow-y-auto pr-2">
-          <Tabs value={tab} onValueChange={setTab}>
-            <TabsList className="mb-4">
+        <Tabs value={tab} onValueChange={setTab} className="flex flex-col flex-1">
+          <div className="flex-shrink-0">
+            <TabsList className="mb-4 flex-shrink-0">
               <TabsTrigger value="details">Vendor Details</TabsTrigger>
               <TabsTrigger value="risk">Risk & Compliance</TabsTrigger>
               <TabsTrigger value="certifications">Certifications</TabsTrigger>
               <TabsTrigger value="contracts">Contract & SLA</TabsTrigger>
             </TabsList>
-
+          </div>
+          <div className="flex-1 overflow-y-auto pr-2">
             <TabsContent value="details" className="space-y-4">
               <div className="grid grid-cols-3 gap-4">
                 <div className="space-y-1.5">
@@ -344,10 +345,10 @@ export default function VendorFormDialog({ open, onOpenChange, vendor, onSave, s
                 </div>
               </div>
             </TabsContent>
-          </Tabs>
-        </div>
+          </div>
+        </Tabs>
 
-        <DialogFooter className="pt-4 border-t">
+        <DialogFooter className="pt-4 border-t flex-shrink-0">
           <Button variant="outline" onClick={() => onOpenChange(false)}>Cancel</Button>
           <Button onClick={() => onSave(form)} disabled={saving || !form.name}>
             {saving ? 'Saving…' : vendor ? 'Update' : 'Create'}
