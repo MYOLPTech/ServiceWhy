@@ -8,7 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Slider } from '@/components/ui/slider';
 
 const emptyRisk = {
-  title: '', description: '', category: 'operational', likelihood: 3, impact: 3,
+  risk_id: '', title: '', description: '', category: 'operational', likelihood: 3, impact: 3,
   risk_score: 9, treatment: 'mitigate', treatment_plan: '', status: 'open', owner: '',
   frameworks: []
 };
@@ -40,9 +40,15 @@ export default function RiskFormDialog({ open, onOpenChange, risk, onSave, savin
           <DialogTitle>{risk ? 'Edit Risk' : 'Add Risk'}</DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <Label>Title *</Label>
-            <Input value={form.title} onChange={e => setForm({...form, title: e.target.value})} required />
+          <div className="grid grid-cols-3 gap-4">
+            <div>
+              <Label>Risk ID</Label>
+              <Input placeholder="RSK-001" value={form.risk_id || ''} onChange={e => setForm({...form, risk_id: e.target.value})} className="font-mono text-sm" />
+            </div>
+            <div className="col-span-2">
+              <Label>Title *</Label>
+              <Input value={form.title} onChange={e => setForm({...form, title: e.target.value})} required />
+            </div>
           </div>
           <div>
             <Label>Description</Label>

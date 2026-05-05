@@ -7,7 +7,7 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 const emptyTask = {
-  title: '', description: '', type: 'implementation', status: 'todo',
+  task_id: '', title: '', description: '', type: 'implementation', status: 'todo',
   priority: 'medium', assignee: '', framework: 'All', linked_control_id: '', due_date: ''
 };
 
@@ -30,9 +30,15 @@ export default function TaskFormDialog({ open, onOpenChange, task, controls, onS
           <DialogTitle>{task ? 'Edit Task' : 'Add Task'}</DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <Label>Title *</Label>
-            <Input value={form.title} onChange={e => setForm({...form, title: e.target.value})} required />
+          <div className="grid grid-cols-3 gap-4">
+            <div>
+              <Label>Task ID</Label>
+              <Input placeholder="TSK-001" value={form.task_id || ''} onChange={e => setForm({...form, task_id: e.target.value})} className="font-mono text-sm" />
+            </div>
+            <div className="col-span-2">
+              <Label>Title *</Label>
+              <Input value={form.title} onChange={e => setForm({...form, title: e.target.value})} required />
+            </div>
           </div>
           <div>
             <Label>Description</Label>
