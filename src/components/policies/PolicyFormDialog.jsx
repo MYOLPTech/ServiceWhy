@@ -35,7 +35,7 @@ const categories = [
   { value: 'other', label: 'Other' },
 ];
 
-const frameworkOptions = ['SOC2', 'ASAE3150', 'ISO27001'];
+const frameworkOptions = ['SOC2', 'ASAE3150', 'ISO27001', 'ISO27017', 'ISO27018'];
 
 const emptyPolicy = {
   policy_id: '', title: '', description: '', category: 'information_security', version: '1.0',
@@ -155,7 +155,7 @@ export default function PolicyFormDialog({ open, onOpenChange, policy, onSave, s
                   {frameworkOptions.map(fw => (
                     <label key={fw} className="flex items-center gap-2 text-sm">
                       <Checkbox checked={form.frameworks.includes(fw)} onCheckedChange={() => toggleFramework(fw)} />
-                      {fw === 'SOC2' ? 'SOC 2' : fw === 'ASAE3150' ? 'ASAE 3150' : 'ISO 27001'}
+                      {fw === 'SOC2' ? 'SOC 2' : fw === 'ASAE3150' ? 'ASAE 3150' : fw === 'ISO27001' ? 'ISO 27001' : fw === 'ISO27017' ? 'ISO 27017' : 'ISO 27018'}
                     </label>
                   ))}
                 </div>

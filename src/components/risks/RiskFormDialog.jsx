@@ -11,7 +11,7 @@ import { base44 } from '@/api/base44Client';
 const emptyRisk = {
   risk_id: '', title: '', description: '', category: 'operational', likelihood: 3, impact: 3,
   risk_score: 9, treatment: 'mitigate', treatment_plan: '', status: 'open', owner: '',
-  frameworks: []
+  frameworks: ['SOC2', 'ASAE3150', 'ISO27001', 'ISO27017', 'ISO27018']
 };
 
 function generateNextId(records, field, prefix) {

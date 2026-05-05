@@ -20,7 +20,9 @@
         "SOC2",
         "ISO27001",
         "ASAE3150",
-        "CDR"
+        "CDR",
+        "ISO27017",
+        "ISO27018"
       ],
       "description": "Applicable framework / regulation"
     },
