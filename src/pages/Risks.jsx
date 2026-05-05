@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
-import { Plus, Search, AlertTriangle, Pencil, Trash2, BookOpen } from 'lucide-react';
+import { Plus, Search, AlertTriangle, Pencil, Trash2, BookOpen, X } from 'lucide-react';
 import RiskGuidePanel from '../components/guides/RiskGuidePanel';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -13,6 +13,7 @@ import StatusBadge from '../components/shared/StatusBadge';
 import EmptyState from '../components/shared/EmptyState';
 import RiskFormDialog from '../components/risks/RiskFormDialog';
 import { cn } from '@/lib/utils';
+import { Link } from 'react-router-dom';
 
 function RiskScoreBadge({ score }) {
   const color = score >= 15 ? 'bg-red-100 text-red-700 border-red-200' : score >= 8 ? 'bg-amber-100 text-amber-700 border-amber-200' : 'bg-green-100 text-green-700 border-green-200';
@@ -27,6 +28,14 @@ export default function Risks() {
   const [editing, setEditing] = useState(null);
   const [deleteId, setDeleteId] = useState(null);
   const [guideRisk, setGuideRisk] = useState(null);
+  const [obligationFilter, setObligationFilter] = useState(null); // { ids: [...], label }
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const ids = params.get('ids');
+    const label = params.get('from');
+    if (ids) setObligationFilter({ ids: ids.split(','), label: label || 'Obligation' });
+  }, []);
 
   const { data: risks = [] } = useQuery({
     queryKey: ['risks'],
@@ -57,13 +66,22 @@ export default function Risks() {
   };
 
   const filtered = risks.filter(r => {
-    const matchesSearch = !search || r.title?.toLowerCase().includes(search.toLowerCase());
+    const matchesSearch = !search || r.title?.toLowerCase().includes(search.toLowerCase()) || r.risk_id?.toLowerCase().includes(search.toLowerCase());
     const matchesStatus = statusFilter === 'all' || r.status === statusFilter;
-    return matchesSearch && matchesStatus;
+    const matchesObligation = !obligationFilter || obligationFilter.ids.includes(r.id);
+    return matchesSearch && matchesStatus && matchesObligation;
   });
 
   return (
     <div>
+      {obligationFilter && (
+        <div className="flex items-center justify-between mb-4 px-4 py-2.5 bg-amber-50 border border-amber-200 rounded-xl text-sm text-amber-800">
+          <span>Filtered by obligation: <strong>{obligationFilter.label}</strong> — showing {filtered.length} linked risk{filtered.length !== 1 ? 's' : ''}</span>
+          <Link to="/risks" onClick={() => setObligationFilter(null)} className="flex items-center gap-1 text-amber-700 hover:text-amber-900 font-medium">
+            <X className="w-3.5 h-3.5" /> Clear filter
+          </Link>
+        </div>
+      )}
       <PageHeader
         title="Risk Register"
         description="Identify, assess, and manage compliance risks"
@@ -98,6 +116,7 @@ export default function Risks() {
           <Table>
             <TableHeader>
               <TableRow className="bg-muted/30">
+                <TableHead className="w-24">ID</TableHead>
                 <TableHead>Risk</TableHead>
                 <TableHead>Category</TableHead>
                 <TableHead className="text-center">Likelihood</TableHead>
@@ -112,6 +131,7 @@ export default function Risks() {
             <TableBody>
               {filtered.map(risk => (
                 <TableRow key={risk.id} className="hover:bg-muted/20 transition-colors">
+                  <TableCell className="font-mono text-xs text-muted-foreground">{risk.risk_id || '—'}</TableCell>
                   <TableCell className="font-medium text-sm max-w-[200px] truncate">{risk.title}</TableCell>
                   <TableCell className="text-sm text-muted-foreground capitalize">{risk.category?.replace('_', ' ') || '—'}</TableCell>
                   <TableCell className="text-center text-sm">{risk.likelihood}</TableCell>

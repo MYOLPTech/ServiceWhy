@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
-import { Plus, Search, Filter, Pencil, Trash2, Shield, BookOpen } from 'lucide-react';
+import { Plus, Search, Filter, Pencil, Trash2, Shield, BookOpen, X } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import ControlGuidePanel from '../components/guides/ControlGuidePanel';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -23,6 +24,14 @@ export default function Controls() {
   const [editingControl, setEditingControl] = useState(null);
   const [deleteId, setDeleteId] = useState(null);
   const [guideControl, setGuideControl] = useState(null);
+  const [obligationFilter, setObligationFilter] = useState(null); // { ids: [...], label }
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const ids = params.get('ids');
+    const label = params.get('from');
+    if (ids) setObligationFilter({ ids: ids.split(','), label: label || 'Obligation' });
+  }, []);
 
   const { data: controls = [], isLoading } = useQuery({
     queryKey: ['controls'],
@@ -56,11 +65,20 @@ export default function Controls() {
     const matchesSearch = !search || c.title?.toLowerCase().includes(search.toLowerCase()) || c.control_id?.toLowerCase().includes(search.toLowerCase());
     const matchesFramework = frameworkFilter === 'all' || c.framework === frameworkFilter;
     const matchesStatus = statusFilter === 'all' || c.status === statusFilter;
-    return matchesSearch && matchesFramework && matchesStatus;
+    const matchesObligation = !obligationFilter || obligationFilter.ids.includes(c.id);
+    return matchesSearch && matchesFramework && matchesStatus && matchesObligation;
   });
 
   return (
     <div>
+      {obligationFilter && (
+        <div className="flex items-center justify-between mb-4 px-4 py-2.5 bg-blue-50 border border-blue-200 rounded-xl text-sm text-blue-800">
+          <span>Filtered by obligation: <strong>{obligationFilter.label}</strong> — showing {filtered.length} linked control{filtered.length !== 1 ? 's' : ''}</span>
+          <Link to="/controls" onClick={() => setObligationFilter(null)} className="flex items-center gap-1 text-blue-700 hover:text-blue-900 font-medium">
+            <X className="w-3.5 h-3.5" /> Clear filter
+          </Link>
+        </div>
+      )}
       <PageHeader
         title="Controls Library"
         description="Manage compliance controls across all frameworks"

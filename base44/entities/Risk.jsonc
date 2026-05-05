@@ -2,6 +2,10 @@
   "name": "Risk",
   "type": "object",
   "properties": {
+    "risk_id": {
+      "type": "string",
+      "description": "Unique risk identifier (e.g. RSK-001)"
+    },
     "title": {
       "type": "string",
       "description": "Risk title"

@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
-import { Plus, Search, CheckSquare, Pencil, Trash2, BookOpen } from 'lucide-react';
+import { Plus, Search, CheckSquare, Pencil, Trash2, BookOpen, X } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import TaskGuidePanel from '../components/guides/TaskGuidePanel';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -25,6 +26,14 @@ export default function Tasks() {
   const [editing, setEditing] = useState(null);
   const [deleteId, setDeleteId] = useState(null);
   const [guideTask, setGuideTask] = useState(null);
+  const [obligationFilter, setObligationFilter] = useState(null); // { ids: [...], label }
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const ids = params.get('ids');
+    const label = params.get('from');
+    if (ids) setObligationFilter({ ids: ids.split(','), label: label || 'Obligation' });
+  }, []);
 
   const { data: tasks = [] } = useQuery({
     queryKey: ['tasks'],
@@ -55,16 +64,25 @@ export default function Tasks() {
   };
 
   const filtered = tasks.filter(t => {
-    const matchesSearch = !search || t.title?.toLowerCase().includes(search.toLowerCase());
+    const matchesSearch = !search || t.title?.toLowerCase().includes(search.toLowerCase()) || t.task_id?.toLowerCase().includes(search.toLowerCase());
     const matchesStatus = statusFilter === 'all' || t.status === statusFilter;
     const matchesFramework = frameworkFilter === 'all' || t.framework === frameworkFilter;
-    return matchesSearch && matchesStatus && matchesFramework;
+    const matchesObligation = !obligationFilter || obligationFilter.ids.includes(t.id);
+    return matchesSearch && matchesStatus && matchesFramework && matchesObligation;
   });
 
   const isOverdue = (t) => t.due_date && new Date(t.due_date) < new Date() && t.status !== 'completed';
 
   return (
     <div>
+      {obligationFilter && (
+        <div className="flex items-center justify-between mb-4 px-4 py-2.5 bg-green-50 border border-green-200 rounded-xl text-sm text-green-800">
+          <span>Filtered by obligation: <strong>{obligationFilter.label}</strong> — showing {filtered.length} linked task{filtered.length !== 1 ? 's' : ''}</span>
+          <Link to="/tasks" onClick={() => setObligationFilter(null)} className="flex items-center gap-1 text-green-700 hover:text-green-900 font-medium">
+            <X className="w-3.5 h-3.5" /> Clear filter
+          </Link>
+        </div>
+      )}
       <PageHeader
         title="Task Management"
         description="Track remediation, implementation, and audit preparation tasks"
@@ -103,6 +121,7 @@ export default function Tasks() {
           <Table>
             <TableHeader>
               <TableRow className="bg-muted/30">
+                <TableHead className="w-24">ID</TableHead>
                 <TableHead>Task</TableHead>
                 <TableHead>Type</TableHead>
                 <TableHead>Framework</TableHead>
@@ -116,6 +135,7 @@ export default function Tasks() {
             <TableBody>
               {filtered.map(task => (
                 <TableRow key={task.id} className="hover:bg-muted/20 transition-colors">
+                  <TableCell className="font-mono text-xs text-muted-foreground">{task.task_id || '—'}</TableCell>
                   <TableCell className="font-medium text-sm max-w-[250px] truncate">{task.title}</TableCell>
                   <TableCell className="text-sm text-muted-foreground capitalize">{task.type?.replace('_', ' ') || '—'}</TableCell>
                   <TableCell><FrameworkBadge framework={task.framework} /></TableCell>
