@@ -1,0 +1,164 @@
+{
+  "name": "CmdbItem",
+  "type": "object",
+  "properties": {
+    "asset_id": {
+      "type": "string",
+      "description": "Unique asset identifier (e.g. ASSET-001)"
+    },
+    "name": {
+      "type": "string",
+      "description": "Asset/configuration item name"
+    },
+    "type": {
+      "type": "string",
+      "enum": [
+        "server",
+        "workstation",
+        "network_device",
+        "cloud_service",
+        "application",
+        "database",
+        "storage",
+        "endpoint",
+        "saas_tool",
+        "virtual_machine",
+        "container",
+        "api",
+        "other"
+      ],
+      "default": "server",
+      "description": "Type of configuration item"
+    },
+    "category": {
+      "type": "string",
+      "enum": [
+        "infrastructure",
+        "software",
+        "cloud",
+        "network",
+        "endpoint",
+        "data",
+        "other"
+      ],
+      "default": "infrastructure"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "active",
+        "inactive",
+        "decommissioned",
+        "under_review",
+        "pending_approval"
+      ],
+      "default": "active"
+    },
+    "criticality": {
+      "type": "string",
+      "enum": [
+        "critical",
+        "high",
+        "medium",
+        "low"
+      ],
+      "default": "medium"
+    },
+    "environment": {
+      "type": "string",
+      "enum": [
+        "production",
+        "staging",
+        "development",
+        "dr",
+        "shared"
+      ],
+      "default": "production"
+    },
+    "owner": {
+      "type": "string",
+      "description": "Person or team responsible"
+    },
+    "location": {
+      "type": "string",
+      "description": "Physical or logical location (e.g. AWS ap-southeast-2, Office Rack A)"
+    },
+    "vendor": {
+      "type": "string",
+      "description": "Vendor or manufacturer"
+    },
+    "version": {
+      "type": "string",
+      "description": "Software version or firmware version"
+    },
+    "ip_address": {
+      "type": "string",
+      "description": "IP address or hostname"
+    },
+    "os": {
+      "type": "string",
+      "description": "Operating system"
+    },
+    "description": {
+      "type": "string",
+      "description": "Full description of the asset and its purpose"
+    },
+    "data_classification": {
+      "type": "string",
+      "enum": [
+        "public",
+        "internal",
+        "confidential",
+        "restricted"
+      ],
+      "default": "internal",
+      "description": "Data classification level of data processed/stored"
+    },
+    "last_reviewed": {
+      "type": "string",
+      "format": "date",
+      "description": "Date of last asset review"
+    },
+    "decommission_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "linked_control_ids": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "IDs of linked Control records"
+    },
+    "linked_risk_ids": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "IDs of linked Risk records"
+    },
+    "linked_task_ids": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "IDs of linked Task records"
+    },
+    "linked_evidence_ids": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "IDs of linked Evidence records"
+    },
+    "notes": {
+      "type": "string",
+      "description": "Additional notes or configuration details"
+    }
+  },
+  "required": [
+    "name",
+    "type",
+    "status"
+  ]
+}
