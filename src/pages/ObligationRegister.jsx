@@ -39,28 +39,54 @@ const PRIORITY_STYLES = {
   low:      'bg-slate-100 text-slate-600',
 };
 
-function LinkedItems({ ids = [], names = [], entityName, path, ItemIcon, color, obligationTitle }) {
+function LinkedItemsCount({ ids = [], entityName, path, ItemIcon, color, obligationTitle }) {
   if (!ids || ids.length === 0) return <span className="text-muted-foreground text-xs">—</span>;
   const href = `${path}?ids=${ids.join(',')}&from=${encodeURIComponent(obligationTitle)}`;
-  const label = names.length > 0
-    ? (names.length === 1 ? names[0] : `${names[0]} +${names.length - 1} more`)
-    : `${ids.length} ${entityName.toLowerCase()}${ids.length !== 1 ? 's' : ''}`;
+  const label = `${ids.length} ${entityName.toLowerCase()}${ids.length !== 1 ? 's' : ''}`;
   return (
-    <Link to={href} title={names.join(', ')}
-      className={`inline-flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-full border font-medium ${color} hover:opacity-80 transition-opacity max-w-[200px] truncate`}>
+    <Link to={href}
+      className={`inline-flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-full border font-medium ${color} hover:opacity-80 transition-opacity w-fit`}>
       <ItemIcon className="w-3 h-3 flex-shrink-0" />
-      <span className="truncate">{label}</span>
+      <span>{label}</span>
     </Link>
+  );
+}
+
+function LinkedNameList({ ids = [], names = [], entityName, path, ItemIcon, color, obligationTitle }) {
+  if (!ids || ids.length === 0) return null;
+  return (
+    <div>
+      <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2 flex items-center gap-1.5">
+        <ItemIcon className="w-3 h-3" /> Linked {entityName}s ({ids.length})
+      </h4>
+      <div className="flex flex-col gap-1">
+        {ids.map((id, i) => {
+          const name = names[i] || id;
+          return (
+            <Link key={id} to={`${path}?ids=${id}&from=${encodeURIComponent(obligationTitle)}`}
+              className={`inline-flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-full border font-medium ${color} hover:opacity-80 transition-opacity max-w-full w-fit`}
+              title={name}>
+              <ItemIcon className="w-3 h-3 flex-shrink-0" />
+              <span className="truncate">{name}</span>
+            </Link>
+          );
+        })}
+      </div>
+    </div>
   );
 }
 
 function ObligationRow({ obligation, riskMap, controlMap, policyMap, taskMap }) {
   const [expanded, setExpanded] = useState(false);
   const fw = FRAMEWORK_STYLES[obligation.framework] || FRAMEWORK_STYLES.SOC2;
-  const riskNames = (obligation.linked_risk_ids || []).map(id => riskMap[id]).filter(Boolean);
-  const controlNames = (obligation.linked_control_ids || []).map(id => controlMap[id]).filter(Boolean);
-  const policyNames = (obligation.linked_policy_ids || []).map(id => policyMap[id]).filter(Boolean);
-  const taskNames = (obligation.linked_task_ids || []).map(id => taskMap[id]).filter(Boolean);
+  const riskIds = obligation.linked_risk_ids || [];
+  const controlIds = obligation.linked_control_ids || [];
+  const policyIds = obligation.linked_policy_ids || [];
+  const taskIds = obligation.linked_task_ids || [];
+  const riskNames = riskIds.map(id => riskMap[id] || id);
+  const controlNames = controlIds.map(id => controlMap[id] || id);
+  const policyNames = policyIds.map(id => policyMap[id] || id);
+  const taskNames = taskIds.map(id => taskMap[id] || id);
 
   return (
     <>
@@ -97,10 +123,10 @@ function ObligationRow({ obligation, riskMap, controlMap, policyMap, taskMap }) 
         <td className="px-2 py-3 text-xs text-muted-foreground font-mono">{obligation.source_reference || '—'}</td>
         <td className="px-2 py-3">
          <div className="flex flex-col gap-1">
-           <LinkedItems ids={obligation.linked_risk_ids} names={riskNames} entityName="Risk" path="/risks" ItemIcon={AlertTriangle} color="border-red-200 text-red-700 bg-red-50" obligationTitle={obligation.title} />
-           <LinkedItems ids={obligation.linked_control_ids} names={controlNames} entityName="Control" path="/controls" ItemIcon={Shield} color="border-blue-200 text-blue-700 bg-blue-50" obligationTitle={obligation.title} />
-           <LinkedItems ids={obligation.linked_policy_ids} names={policyNames} entityName="Policy" path="/policies" ItemIcon={FileText} color="border-purple-200 text-purple-700 bg-purple-50" obligationTitle={obligation.title} />
-           <LinkedItems ids={obligation.linked_task_ids} names={taskNames} entityName="Task" path="/tasks" ItemIcon={CheckSquare} color="border-green-200 text-green-700 bg-green-50" obligationTitle={obligation.title} />
+           <LinkedItemsCount ids={riskIds} entityName="Risk" path="/risks" ItemIcon={AlertTriangle} color="border-red-200 text-red-700 bg-red-50" obligationTitle={obligation.title} />
+           <LinkedItemsCount ids={controlIds} entityName="Control" path="/controls" ItemIcon={Shield} color="border-blue-200 text-blue-700 bg-blue-50" obligationTitle={obligation.title} />
+           <LinkedItemsCount ids={policyIds} entityName="Policy" path="/policies" ItemIcon={FileText} color="border-purple-200 text-purple-700 bg-purple-50" obligationTitle={obligation.title} />
+           <LinkedItemsCount ids={taskIds} entityName="Task" path="/tasks" ItemIcon={CheckSquare} color="border-green-200 text-green-700 bg-green-50" obligationTitle={obligation.title} />
          </div>
         </td>
       </tr>
@@ -119,28 +145,14 @@ function ObligationRow({ obligation, riskMap, controlMap, policyMap, taskMap }) 
                 </div>
               )}
             </div>
-            <div className="mt-3 flex flex-wrap gap-3 text-xs">
-              {(obligation.linked_risk_ids?.length > 0) && (
-                <Link to={`/risks?ids=${obligation.linked_risk_ids.join(',')}&from=${encodeURIComponent(obligation.title)}`} className="inline-flex items-center gap-1 text-red-600 hover:underline font-medium">
-                  <AlertTriangle className="w-3 h-3" /> View {obligation.linked_risk_ids.length} linked risk{obligation.linked_risk_ids.length > 1 ? 's' : ''}
-                </Link>
-              )}
-              {(obligation.linked_control_ids?.length > 0) && (
-               <Link to={`/controls?ids=${obligation.linked_control_ids.join(',')}&from=${encodeURIComponent(obligation.title)}`} className="inline-flex items-center gap-1 text-blue-600 hover:underline font-medium">
-                 <Shield className="w-3 h-3" /> View {obligation.linked_control_ids.length} linked control{obligation.linked_control_ids.length > 1 ? 's' : ''}
-               </Link>
-              )}
-              {(obligation.linked_policy_ids?.length > 0) && (
-               <Link to={`/policies?ids=${obligation.linked_policy_ids.join(',')}&from=${encodeURIComponent(obligation.title)}`} className="inline-flex items-center gap-1 text-purple-600 hover:underline font-medium">
-                 <FileText className="w-3 h-3" /> View {obligation.linked_policy_ids.length} linked polic{obligation.linked_policy_ids.length > 1 ? 'ies' : 'y'}
-               </Link>
-              )}
-              {(obligation.linked_task_ids?.length > 0) && (
-                <Link to={`/tasks?ids=${obligation.linked_task_ids.join(',')}&from=${encodeURIComponent(obligation.title)}`} className="inline-flex items-center gap-1 text-green-600 hover:underline font-medium">
-                  <CheckSquare className="w-3 h-3" /> View {obligation.linked_task_ids.length} linked task{obligation.linked_task_ids.length > 1 ? 's' : ''}
-                </Link>
-              )}
-            </div>
+            {(riskIds.length > 0 || controlIds.length > 0 || policyIds.length > 0 || taskIds.length > 0) && (
+              <div className="mt-4 pt-4 border-t border-border/40 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                <LinkedNameList ids={riskIds} names={riskNames} entityName="Risk" path="/risks" ItemIcon={AlertTriangle} color="border-red-200 text-red-700 bg-red-50" obligationTitle={obligation.title} />
+                <LinkedNameList ids={controlIds} names={controlNames} entityName="Control" path="/controls" ItemIcon={Shield} color="border-blue-200 text-blue-700 bg-blue-50" obligationTitle={obligation.title} />
+                <LinkedNameList ids={policyIds} names={policyNames} entityName="Policy" path="/policies" ItemIcon={FileText} color="border-purple-200 text-purple-700 bg-purple-50" obligationTitle={obligation.title} />
+                <LinkedNameList ids={taskIds} names={taskNames} entityName="Task" path="/tasks" ItemIcon={CheckSquare} color="border-green-200 text-green-700 bg-green-50" obligationTitle={obligation.title} />
+              </div>
+            )}
           </td>
         </tr>
       )}
