@@ -66,7 +66,7 @@ export default function Tasks() {
     const matchesSearch = !search || t.title?.toLowerCase().includes(search.toLowerCase()) || t.task_id?.toLowerCase().includes(search.toLowerCase());
     const matchesStatus = statusFilter === 'all' || t.status === statusFilter;
     const matchesFramework = frameworkFilter === 'all' || t.framework === frameworkFilter;
-    const matchesObligation = !obligationFilter || obligationFilter.ids.includes(t.id);
+    const matchesObligation = !obligationFilter || obligationFilter.ids.includes(t.id) || obligationFilter.ids.includes(t.task_id);
     return matchesSearch && matchesStatus && matchesFramework && matchesObligation;
   });
 

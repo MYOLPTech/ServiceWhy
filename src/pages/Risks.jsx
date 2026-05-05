@@ -67,7 +67,7 @@ export default function Risks() {
   const filtered = risks.filter(r => {
     const matchesSearch = !search || r.title?.toLowerCase().includes(search.toLowerCase()) || r.risk_id?.toLowerCase().includes(search.toLowerCase());
     const matchesStatus = statusFilter === 'all' || r.status === statusFilter;
-    const matchesObligation = !obligationFilter || obligationFilter.ids.includes(r.id);
+    const matchesObligation = !obligationFilter || obligationFilter.ids.includes(r.id) || obligationFilter.ids.includes(r.risk_id);
     return matchesSearch && matchesStatus && matchesObligation;
   });
 

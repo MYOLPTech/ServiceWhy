@@ -64,7 +64,7 @@ export default function Controls() {
     const matchesSearch = !search || c.title?.toLowerCase().includes(search.toLowerCase()) || c.control_id?.toLowerCase().includes(search.toLowerCase());
     const matchesFramework = frameworkFilter === 'all' || c.framework === frameworkFilter;
     const matchesStatus = statusFilter === 'all' || c.status === statusFilter;
-    const matchesObligation = !obligationFilter || obligationFilter.ids.includes(c.id);
+    const matchesObligation = !obligationFilter || obligationFilter.ids.includes(c.id) || obligationFilter.ids.includes(c.control_id);
     return matchesSearch && matchesFramework && matchesStatus && matchesObligation;
   });
 
