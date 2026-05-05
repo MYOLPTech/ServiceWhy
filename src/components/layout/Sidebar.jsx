@@ -10,16 +10,15 @@ import { useState } from 'react';
 
 const navItems = [
   { icon: LayoutDashboard, label: 'Dashboard', path: '/' },
-  { icon: Shield, label: 'Controls', path: '/controls' },
-  { icon: FileCheck, label: 'Evidence', path: '/evidence' },
-  { icon: AlertTriangle, label: 'Risks', path: '/risks' },
-  { icon: FileText, label: 'Policies', path: '/policies' },
-  { icon: CheckSquare, label: 'Tasks', path: '/tasks' },
+  { icon: BarChart3, label: 'Reports', path: '/reports' },
   { icon: ClipboardCheck, label: 'Audit Readiness', path: '/audit' },
+  { icon: AlertTriangle, label: 'Risks', path: '/risks' },
   { icon: BookMarked, label: 'Obligations', path: '/obligations' },
+  { icon: FileText, label: 'Policies', path: '/policies' },
+  { icon: Shield, label: 'Controls', path: '/controls' },
   { icon: Database, label: 'CMDB', path: '/cmdb' },
   { icon: Building, label: 'Vendors', path: '/vendors' },
-  { icon: BarChart3, label: 'Reports', path: '/reports' },
+  { icon: CheckSquare, label: 'Tasks', path: '/tasks' },
 ];
 
 export default function Sidebar() {
