@@ -20,6 +20,11 @@ const categories = [
   { value: 'acceptable_use', label: 'Acceptable Use' },
   { value: 'hr_security', label: 'HR Security' },
   { value: 'physical_security', label: 'Physical Security' },
+  { value: 'risk_management', label: 'Risk Management' },
+  { value: 'cryptography', label: 'Cryptography' },
+  { value: 'operations_security', label: 'Operations Security' },
+  { value: 'communications_security', label: 'Communications Security' },
+  { value: 'compliance', label: 'Compliance' },
   { value: 'other', label: 'Other' },
 ];
 
@@ -27,15 +32,18 @@ const frameworkOptions = ['SOC2', 'ASAE3150', 'ISO27001'];
 
 const emptyPolicy = {
   title: '', description: '', category: 'information_security', version: '1.0',
-  status: 'draft', owner: '', approver: '', file_url: '', frameworks: [], review_date: '', approved_date: ''
+  status: 'draft', owner: '', approver: '', file_url: '', policy_content: '',
+  frameworks: [], review_date: '', approved_date: ''
 };
 
 export default function PolicyFormDialog({ open, onOpenChange, policy, onSave, saving }) {
   const [form, setForm] = useState(emptyPolicy);
   const [uploading, setUploading] = useState(false);
+  const [tab, setTab] = useState('details');
 
   useEffect(() => {
     setForm(policy ? { ...emptyPolicy, ...policy, frameworks: policy.frameworks || [] } : emptyPolicy);
+    setTab('details');
   }, [policy, open]);
 
   const toggleFramework = (fw) => {
@@ -61,84 +69,111 @@ export default function PolicyFormDialog({ open, onOpenChange, policy, onSave, s
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>{policy ? 'Edit Policy' : 'Add Policy'}</DialogTitle>
         </DialogHeader>
+
+        {/* Tabs */}
+        <div className="flex gap-1 border-b border-border mb-4">
+          {['details', 'content'].map(t => (
+            <button
+              key={t}
+              type="button"
+              onClick={() => setTab(t)}
+              className={`px-4 py-2 text-sm font-medium capitalize border-b-2 transition-colors ${
+                tab === t ? 'border-primary text-primary' : 'border-transparent text-muted-foreground hover:text-foreground'
+              }`}
+            >
+              {t === 'content' ? 'Policy Document' : 'Details'}
+            </button>
+          ))}
+        </div>
+
         <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <Label>Title *</Label>
-            <Input value={form.title} onChange={e => setForm({...form, title: e.target.value})} required />
-          </div>
-          <div>
-            <Label>Description</Label>
-            <Textarea value={form.description} onChange={e => setForm({...form, description: e.target.value})} rows={2} />
-          </div>
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <Label>Category</Label>
-              <Select value={form.category} onValueChange={v => setForm({...form, category: v})}>
-                <SelectTrigger><SelectValue /></SelectTrigger>
-                <SelectContent>
-                  {categories.map(c => <SelectItem key={c.value} value={c.value}>{c.label}</SelectItem>)}
-                </SelectContent>
-              </Select>
-            </div>
-            <div>
-              <Label>Status</Label>
-              <Select value={form.status} onValueChange={v => setForm({...form, status: v})}>
-                <SelectTrigger><SelectValue /></SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="draft">Draft</SelectItem>
-                  <SelectItem value="in_review">In Review</SelectItem>
-                  <SelectItem value="approved">Approved</SelectItem>
-                  <SelectItem value="published">Published</SelectItem>
-                  <SelectItem value="retired">Retired</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <Label>Owner</Label>
-              <Input value={form.owner} onChange={e => setForm({...form, owner: e.target.value})} />
-            </div>
-            <div>
-              <Label>Approver</Label>
-              <Input value={form.approver} onChange={e => setForm({...form, approver: e.target.value})} />
-            </div>
-          </div>
-          <div>
-            <Label>Applicable Frameworks</Label>
-            <div className="flex gap-4 mt-2">
-              {frameworkOptions.map(fw => (
-                <label key={fw} className="flex items-center gap-2 text-sm">
-                  <Checkbox checked={form.frameworks.includes(fw)} onCheckedChange={() => toggleFramework(fw)} />
-                  {fw === 'SOC2' ? 'SOC 2' : fw === 'ASAE3150' ? 'ASAE 3150' : 'ISO 27001'}
-                </label>
-              ))}
-            </div>
-          </div>
-          <div>
-            <Label>Version</Label>
-            <Input value={form.version} onChange={e => setForm({...form, version: e.target.value})} />
-          </div>
-          <div>
-            <Label>Upload Document</Label>
-            {form.file_url ? (
-              <div className="flex items-center gap-2 p-3 bg-muted rounded-lg mt-1">
-                <Upload className="w-4 h-4 text-muted-foreground" />
-                <span className="text-sm truncate flex-1">Document uploaded</span>
-                <Button type="button" variant="ghost" size="sm" onClick={() => setForm({...form, file_url: ''})}>Remove</Button>
+          {tab === 'details' && (
+            <>
+              <div>
+                <Label>Title *</Label>
+                <Input value={form.title} onChange={e => setForm({...form, title: e.target.value})} required />
               </div>
-            ) : (
-              <Input type="file" onChange={handleFile} disabled={uploading} className="mt-1" />
-            )}
-          </div>
-          <div className="grid grid-cols-2 gap-4">
-            <div><Label>Review Date</Label><Input type="date" value={form.review_date} onChange={e => setForm({...form, review_date: e.target.value})} /></div>
-            <div><Label>Approved Date</Label><Input type="date" value={form.approved_date} onChange={e => setForm({...form, approved_date: e.target.value})} /></div>
-          </div>
+              <div>
+                <Label>Description</Label>
+                <Textarea value={form.description} onChange={e => setForm({...form, description: e.target.value})} rows={2} />
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label>Category</Label>
+                  <Select value={form.category} onValueChange={v => setForm({...form, category: v})}>
+                    <SelectTrigger><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      {categories.map(c => <SelectItem key={c.value} value={c.value}>{c.label}</SelectItem>)}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div>
+                  <Label>Status</Label>
+                  <Select value={form.status} onValueChange={v => setForm({...form, status: v})}>
+                    <SelectTrigger><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="draft">Draft</SelectItem>
+                      <SelectItem value="in_review">In Review</SelectItem>
+                      <SelectItem value="approved">Approved</SelectItem>
+                      <SelectItem value="published">Published</SelectItem>
+                      <SelectItem value="retired">Retired</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div><Label>Owner</Label><Input value={form.owner} onChange={e => setForm({...form, owner: e.target.value})} /></div>
+                <div><Label>Approver</Label><Input value={form.approver} onChange={e => setForm({...form, approver: e.target.value})} /></div>
+              </div>
+              <div>
+                <Label>Applicable Frameworks</Label>
+                <div className="flex gap-4 mt-2">
+                  {frameworkOptions.map(fw => (
+                    <label key={fw} className="flex items-center gap-2 text-sm">
+                      <Checkbox checked={form.frameworks.includes(fw)} onCheckedChange={() => toggleFramework(fw)} />
+                      {fw === 'SOC2' ? 'SOC 2' : fw === 'ASAE3150' ? 'ASAE 3150' : 'ISO 27001'}
+                    </label>
+                  ))}
+                </div>
+              </div>
+              <div><Label>Version</Label><Input value={form.version} onChange={e => setForm({...form, version: e.target.value})} /></div>
+              <div>
+                <Label>Upload Document</Label>
+                {form.file_url ? (
+                  <div className="flex items-center gap-2 p-3 bg-muted rounded-lg mt-1">
+                    <Upload className="w-4 h-4 text-muted-foreground" />
+                    <span className="text-sm truncate flex-1">Document uploaded</span>
+                    <Button type="button" variant="ghost" size="sm" onClick={() => setForm({...form, file_url: ''})}>Remove</Button>
+                  </div>
+                ) : (
+                  <Input type="file" onChange={handleFile} disabled={uploading} className="mt-1" />
+                )}
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div><Label>Review Date</Label><Input type="date" value={form.review_date} onChange={e => setForm({...form, review_date: e.target.value})} /></div>
+                <div><Label>Approved Date</Label><Input type="date" value={form.approved_date} onChange={e => setForm({...form, approved_date: e.target.value})} /></div>
+              </div>
+            </>
+          )}
+
+          {tab === 'content' && (
+            <div>
+              <Label>Policy Document (HTML)</Label>
+              <p className="text-xs text-muted-foreground mt-1 mb-2">Enter the full policy document in HTML format. Use &lt;h1&gt;, &lt;h2&gt;, &lt;h3&gt;, &lt;p&gt;, &lt;ul&gt;, &lt;ol&gt;, &lt;table&gt; tags for formatting.</p>
+              <Textarea
+                value={form.policy_content}
+                onChange={e => setForm({...form, policy_content: e.target.value})}
+                rows={20}
+                className="font-mono text-xs"
+                placeholder="<h1>Policy Title</h1>&#10;<h2>1. Purpose</h2>&#10;<p>This policy...</p>"
+              />
+            </div>
+          )}
+
           <div className="flex justify-end gap-3 pt-2">
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>Cancel</Button>
             <Button type="submit" disabled={saving || uploading}>{saving ? 'Saving...' : 'Save'}</Button>

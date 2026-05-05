@@ -21,6 +21,11 @@
         "acceptable_use",
         "hr_security",
         "physical_security",
+        "risk_management",
+        "cryptography",
+        "operations_security",
+        "communications_security",
+        "compliance",
         "other"
       ],
       "default": "information_security"
@@ -48,6 +53,10 @@
     },
     "file_url": {
       "type": "string"
+    },
+    "policy_content": {
+      "type": "string",
+      "description": "Full HTML policy document content"
     },
     "frameworks": {
       "type": "array",
