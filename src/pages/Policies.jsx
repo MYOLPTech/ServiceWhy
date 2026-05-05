@@ -85,6 +85,7 @@ export default function Policies() {
           <Table>
             <TableHeader>
               <TableRow className="bg-muted/30">
+                <TableHead className="w-24">ID</TableHead>
                 <TableHead>Title</TableHead>
                 <TableHead>Category</TableHead>
                 <TableHead>Frameworks</TableHead>
@@ -98,6 +99,7 @@ export default function Policies() {
             <TableBody>
               {filtered.map(p => (
                 <TableRow key={p.id} className="hover:bg-muted/20 transition-colors">
+                  <TableCell className="text-sm text-muted-foreground font-mono">{p.policy_id || '—'}</TableCell>
                   <TableCell className="font-medium text-sm">{p.title}</TableCell>
                   <TableCell className="text-sm text-muted-foreground capitalize">{p.category?.replace(/_/g, ' ') || '—'}</TableCell>
                   <TableCell>
