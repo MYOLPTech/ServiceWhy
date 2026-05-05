@@ -77,32 +77,105 @@ Deno.serve(async (req) => {
     const dataContent = dataSQL.join('\n');
     const jsonContent = JSON.stringify(jsonData, null, 2);
 
-    // Return the generated files
+    // Files to upload
+    const files = [
+      { name: `datastructure/schema_${timestamp}.sql`, content: schemaContent },
+      { name: `datadump/dump_${timestamp}.sql`, content: dataContent },
+      { name: `datadump/dump_${timestamp}.json`, content: jsonContent }
+    ];
+
+    // Upload to GitHub using session
+    let githubResults = null;
+    try {
+      const { accessToken } = await base44.asServiceRole.connectors.getConnection('github');
+      if (accessToken) {
+        githubResults = await uploadFilesToGithub(accessToken, files);
+      }
+    } catch (err) {
+      console.warn('GitHub upload not available:', err.message);
+    }
+
     return Response.json({
       success: true,
       timestamp,
       files: {
-        schema: {
-          name: `datastructure/schema_${timestamp}.sql`,
-          content: schemaContent,
-          size: schemaContent.length
-        },
-        data: {
-          name: `datadump/dump_${timestamp}.sql`,
-          content: dataContent,
-          size: dataContent.length
-        },
-        json: {
-          name: `datadump/dump_${timestamp}.json`,
-          content: jsonContent,
-          size: jsonContent.length
-        }
-      }
+        schema: { name: files[0].name, size: schemaContent.length },
+        data: { name: files[1].name, size: dataContent.length },
+        json: { name: files[2].name, size: jsonContent.length }
+      },
+      github: githubResults || { status: 'not_connected', message: 'GitHub connector not available' }
     });
   } catch (error) {
     return Response.json({ error: error.message }, { status: 500 });
   }
 });
+
+async function uploadFilesToGithub(accessToken, files) {
+  try {
+    // First, get repo info from GitHub
+    const userResp = await fetch('https://api.github.com/user', {
+      headers: { Authorization: `token ${accessToken}` }
+    });
+    const userData = await userResp.json();
+    const login = userData.login;
+
+    // Try to find the repo with "compliance" or similar in name, otherwise use first repo
+    const reposResp = await fetch(`https://api.github.com/user/repos?per_page=100`, {
+      headers: { Authorization: `token ${accessToken}` }
+    });
+    const repos = await reposResp.json();
+    let targetRepo = repos.find(r => r.name.toLowerCase().includes('compliance') || r.name.toLowerCase().includes('data')) || repos[0];
+
+    if (!targetRepo) {
+      return { status: 'error', message: 'No repositories found' };
+    }
+
+    const results = [];
+    for (const file of files) {
+      const path = file.name;
+      const content = file.content;
+      
+      // Check if file exists
+      const checkUrl = `https://api.github.com/repos/${login}/${targetRepo.name}/contents/${path}`;
+      const checkResp = await fetch(checkUrl, {
+        headers: { Authorization: `token ${accessToken}` }
+      });
+
+      let sha = null;
+      if (checkResp.ok) {
+        const existing = await checkResp.json();
+        sha = existing.sha;
+      }
+
+      // Upload/update file
+      const uploadPayload = {
+        message: `[DATAPUMP] ${path}`,
+        content: btoa(content),
+        ...(sha && { sha })
+      };
+
+      const uploadResp = await fetch(checkUrl, {
+        method: 'PUT',
+        headers: {
+          Authorization: `token ${accessToken}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(uploadPayload)
+      });
+
+      if (uploadResp.ok) {
+        results.push({ file: path, status: 'success' });
+      } else {
+        const error = await uploadResp.text();
+        results.push({ file: path, status: 'failed', error });
+      }
+    }
+
+    return { status: 'success', repo: `${login}/${targetRepo.name}`, uploads: results };
+  } catch (error) {
+    return { status: 'error', message: error.message };
+  }
+}
 
 function getPostgresType(definition) {
   if (!definition) return 'TEXT';

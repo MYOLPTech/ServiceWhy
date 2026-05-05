@@ -41,22 +41,16 @@ export default function Dashboard() {
     setDatapumpLoading(true);
     try {
       const response = await base44.functions.invoke('datapump', {});
-      const { files } = response.data;
+      const { files, github } = response.data;
 
-      // Create downloadable files
-      for (const [key, fileData] of Object.entries(files)) {
-        const blob = new Blob([fileData.content], { type: key === 'json' ? 'application/json' : 'text/plain' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = fileData.name;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
+      // Show result based on GitHub status
+      if (github.status === 'success') {
+        toast.success(`Data pumped to GitHub (${github.repo})`);
+      } else if (github.status === 'not_connected') {
+        toast.info('Data generated (GitHub not connected)');
+      } else {
+        toast.error('Data generated but GitHub upload failed');
       }
-
-      toast.success('Data export generated and downloaded');
     } catch (error) {
       toast.error('Failed to generate data export');
     } finally {
