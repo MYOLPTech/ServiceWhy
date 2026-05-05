@@ -133,7 +133,7 @@ export default function Evidence() {
           <Table>
             <TableHeader>
               <TableRow className="bg-muted/30">
-                <TableHead className="cursor-pointer hover:bg-muted/50" onClick={() => handleSort('evidence_id')}>ID {sortBy === 'evidence_id' && (sortDir === 'asc' ? '↑' : '↓')}</TableHead>
+                <TableHead className="w-24 cursor-pointer hover:bg-muted/50" onClick={() => handleSort('evidence_id')}>ID {sortBy === 'evidence_id' && (sortDir === 'asc' ? '↑' : '↓')}</TableHead>
                 <TableHead className="cursor-pointer hover:bg-muted/50" onClick={() => handleSort('title')}>Title {sortBy === 'title' && (sortDir === 'asc' ? '↑' : '↓')}</TableHead>
                 <TableHead className="cursor-pointer hover:bg-muted/50" onClick={() => handleSort('status')}>Status {sortBy === 'status' && (sortDir === 'asc' ? '↑' : '↓')}</TableHead>
                 <TableHead className="cursor-pointer hover:bg-muted/50" onClick={() => handleSort('created_date')}>Uploaded {sortBy === 'created_date' && (sortDir === 'asc' ? '↑' : '↓')}</TableHead>
@@ -144,7 +144,7 @@ export default function Evidence() {
             <TableBody>
               {filtered.map(e => (
                 <TableRow key={e.id} className="hover:bg-muted/20 transition-colors">
-                  <TableCell className="text-sm font-mono text-primary">{e.evidence_id}</TableCell>
+                  <TableCell className="font-mono text-xs text-muted-foreground">{e.evidence_id || '—'}</TableCell>
                   <TableCell>
                     <div>
                       <p className="text-sm font-medium">{e.title}</p>

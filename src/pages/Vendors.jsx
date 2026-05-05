@@ -154,6 +154,7 @@ export default function Vendors() {
           <Table>
             <TableHeader>
               <TableRow>
+                <TableHead className="w-24 cursor-pointer hover:bg-muted/50" onClick={() => handleSort('vendor_id')}>ID {sortBy === 'vendor_id' && (sortDir === 'asc' ? '↑' : '↓')}</TableHead>
                 <TableHead className="cursor-pointer hover:bg-muted/50" onClick={() => handleSort('name')}>Vendor {sortBy === 'name' && (sortDir === 'asc' ? '↑' : '↓')}</TableHead>
                 <TableHead className="cursor-pointer hover:bg-muted/50" onClick={() => handleSort('category')}>Category {sortBy === 'category' && (sortDir === 'asc' ? '↑' : '↓')}</TableHead>
                 <TableHead className="cursor-pointer hover:bg-muted/50" onClick={() => handleSort('status')}>Status {sortBy === 'status' && (sortDir === 'asc' ? '↑' : '↓')}</TableHead>
@@ -166,11 +167,9 @@ export default function Vendors() {
             <TableBody>
               {filteredVendors.map(v => (
                 <TableRow key={v.id}>
+                  <TableCell className="font-mono text-xs text-muted-foreground">{v.vendor_id || '—'}</TableCell>
                   <TableCell className="font-medium">
-                    <div>
-                      {v.vendor_id && <span className="text-xs text-muted-foreground font-mono">{v.vendor_id} – </span>}
-                      {v.name}
-                    </div>
+                    <div>{v.name}</div>
                     {v.primary_contact && <p className="text-xs text-muted-foreground mt-0.5">{v.primary_contact}</p>}
                   </TableCell>
                   <TableCell className="text-sm capitalize">{v.category?.replace(/_/g, ' ')}</TableCell>
