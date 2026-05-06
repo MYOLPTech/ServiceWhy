@@ -99,7 +99,7 @@ const Login = () => {
               MAY 6, 2026 | 9:45 A.M. PT
             </p>
             <h1 className="font-outfit font-bold text-5xl md:text-6xl lg:text-[72px] leading-[1.05] tracking-tight">
-              <span className="text-[#81d24f] block mb-1">The Blueprint to</span>
+              <span className="text-[#81d24f] block mb-1">The Beer Coaster to</span>
               <span className="text-white block text-4xl md:text-5xl lg:text-6xl mt-2">Build Your Own GRC Platform with Agentic AI</span>
             </h1>
           </div>
