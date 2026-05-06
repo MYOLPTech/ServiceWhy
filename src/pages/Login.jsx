@@ -75,7 +75,7 @@ const Login = () => {
           drinky<span className="text-[#81d24f] ml-0.5">26</span>
         </div>
         <p className="text-white font-medium text-center">
-          Drinking Time 2026 in your timezone. Relive the day one keynote in Australia 9:45 a.m. AEST, Asia Pacific at 9:45 a.m. IST, and Europe at 9:45 a.m. BST.
+          Keynote speaker may be running late in your timezone, so grab yourself a drink a sit back and relax. Be with you shortly.
         </p>
         <button className="bg-white text-[#0a424e] px-4 py-1.5 rounded-full font-semibold text-xs hover:bg-gray-100 whitespace-nowrap">
           Tune In
