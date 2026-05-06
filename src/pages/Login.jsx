@@ -5,7 +5,7 @@ import { Navigate } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 
 const Login = () => {
-  const { login, isAuthenticated } = useAuth();
+  const { login, isAuthenticated, authError } = useAuth();
 
   if (isAuthenticated) {
     return <Navigate to="/" replace />;
@@ -34,6 +34,11 @@ const Login = () => {
           </CardDescription>
         </CardHeader>
         <CardContent className="flex flex-col items-center justify-center pb-10 space-y-4">
+          {authError && (
+            <div className="p-4 bg-red-50 text-red-600 rounded-lg text-sm text-center border border-red-100 mb-4">
+              {authError.message}
+            </div>
+          )}
           <GoogleLogin
             onSuccess={handleSuccess}
             onError={handleError}

@@ -24,6 +24,9 @@ export const AuthProvider = ({ children }) => {
         if (decoded.exp * 1000 < Date.now()) {
           logout(false);
           setAuthError({ type: 'auth_required', message: 'Session expired' });
+        } else if (decoded.email !== 'tech@myolifeplan.com') {
+          logout(false);
+          setAuthError({ type: 'unauthorized', message: 'Unauthorized access: only tech@myolifeplan.com is permitted.' });
         } else {
           setUser(decoded);
           setIsAuthenticated(true);
@@ -42,8 +45,12 @@ export const AuthProvider = ({ children }) => {
   const login = (credentialResponse) => {
     const { credential } = credentialResponse;
     if (credential) {
-      localStorage.setItem('google_auth_token', credential);
       const decoded = jwtDecode(credential);
+      if (decoded.email !== 'tech@myolifeplan.com') {
+        setAuthError({ type: 'unauthorized', message: 'Unauthorized access: only tech@myolifeplan.com is permitted.' });
+        return;
+      }
+      localStorage.setItem('google_auth_token', credential);
       setUser(decoded);
       setIsAuthenticated(true);
       setAuthError(null);
