@@ -28,7 +28,7 @@ const Login = () => {
           <span className="text-white text-2xl font-bold tracking-tight">
             servicewhy
           </span>
-          <div className="w-2.5 h-2.5 rounded-full bg-[#81d24f] mb-2" />
+          <div className="w-2.5 h-2.5 rounded-full bg-[#9333ea] mb-2" />
         </div>
       </nav>
 
@@ -46,7 +46,7 @@ const Login = () => {
           <p className="text-gray-300 mb-6 text-lg">Sign in to access your platform</p>
           <div className="flex justify-center">
             <div className="relative inline-block group">
-              <button className="bg-[#81d24f] text-[#011E26] px-10 py-3.5 rounded-full font-bold text-lg hover:bg-[#72c244] transition-colors shadow-[0_0_20px_rgba(129,210,79,0.3)] group-hover:shadow-[0_0_30px_rgba(129,210,79,0.5)]">
+              <button className="bg-[#9333ea] text-white px-10 py-3.5 rounded-full font-bold text-lg hover:bg-[#7e22ce] transition-colors shadow-[0_0_20px_rgba(147,51,234,0.3)] group-hover:shadow-[0_0_30px_rgba(147,51,234,0.5)]">
                 Sign In
               </button>
               <div className="absolute inset-0 opacity-0 overflow-hidden w-full h-full cursor-pointer z-10 flex items-center justify-center">
