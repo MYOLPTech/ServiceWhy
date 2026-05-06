@@ -63,7 +63,7 @@ const AuthenticatedApp = () => {
 function App() {
 
   return (
-    <GoogleOAuthProvider clientId="223421761797-v2f9j0sqgpu8867rubs5jsi909ul3a9v.apps.googleusercontent.com">
+    <GoogleOAuthProvider clientId="1073471752477-5j9m1pqq0egalql8qqg21d5ad3eqk35i.apps.googleusercontent.com">
       <AuthProvider>
         <QueryClientProvider client={queryClientInstance}>
           <Router>
