@@ -81,7 +81,7 @@ export default function RiskFormDialog({ open, onOpenChange, risk, onSave, savin
             <TabsTrigger value="links">Linked Records</TabsTrigger>
           </TabsList>
         </Tabs>
-        <form onSubmit={handleSubmit} className={tab === 'details' ? 'space-y-4' : 'hidden'}>
+        <form id="risk-form" onSubmit={handleSubmit} className={tab === 'details' ? 'space-y-4' : 'hidden'}>
           <div className="grid grid-cols-3 gap-4">
             <div>
               <Label>Risk ID</Label>
@@ -159,10 +159,6 @@ export default function RiskFormDialog({ open, onOpenChange, risk, onSave, savin
           <div>
             <Label>Treatment Plan</Label>
             <Textarea value={form.treatment_plan} onChange={e => setForm({...form, treatment_plan: e.target.value})} rows={3} />
-          </div>
-          <div className="flex justify-end gap-3 pt-2">
-            <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>Cancel</Button>
-            <Button type="submit" disabled={saving}>{saving ? 'Saving...' : 'Save Risk'}</Button>
           </div>
           </form>
           {tab === 'links' && (
