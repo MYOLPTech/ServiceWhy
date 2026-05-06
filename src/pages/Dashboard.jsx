@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 import StatCard from '../components/dashboard/StatCard';
 import FrameworkProgress from '../components/dashboard/FrameworkProgress';
+import ImportProgressDialog from '../components/dashboard/ImportProgressDialog';
 import PageHeader from '../components/shared/PageHeader';
 import StatusBadge from '../components/shared/StatusBadge';
 import FrameworkBadge from '../components/shared/FrameworkBadge';
@@ -16,6 +17,7 @@ export default function Dashboard() {
   const [datapumpLoading, setDatapumpLoading] = useState(false);
   const [exportLoading, setExportLoading] = useState(false);
   const [importLoading, setImportLoading] = useState(false);
+  const [importProgress, setImportProgress] = useState({ open: false, status: '', progress: 0, totals: null, phase: '', errors: [] });
   const fileInputRef = useRef(null);
 
   const { data: controls = [] } = useQuery({
@@ -72,20 +74,70 @@ export default function Dashboard() {
     e.target.value = '';
     if (!file) return;
     setImportLoading(true);
+    setImportProgress({ open: true, status: 'Uploading file...', progress: 0, totals: null, phase: 'Uploading', errors: [] });
+
+    const errors = [];
+    let totalCreated = 0, totalUpdated = 0, totalLinks = 0;
+
     try {
       const { file_url } = await base44.integrations.Core.UploadFile({ file });
-      const response = await base44.functions.invoke('importExcel', { file_url });
-      const stats = response.data?.stats;
-      if (stats) {
-        const totalCreated = Object.values(stats.created).reduce((a, b) => a + b, 0);
-        const totalUpdated = Object.values(stats.updated).reduce((a, b) => a + b, 0);
-        toast.success(`Import complete: ${totalCreated} created, ${totalUpdated} updated, ${stats.links} links`);
-        if (stats.errors?.length) console.warn('Import errors:', stats.errors);
-      } else {
-        toast.success('Import complete');
+
+      // Phase 1: Plan
+      setImportProgress(p => ({ ...p, status: 'Analyzing changes...', phase: 'Planning' }));
+      const planRes = await base44.functions.invoke('importExcel', { file_url, phase: 'plan' });
+      const { plan, idMap: initialIdMap, totalWork } = planRes.data;
+      const totals = {
+        create: plan.totals.create,
+        update: plan.totals.update,
+        skip: plan.totals.skip,
+        links: plan.totals.links,
+        total: totalWork,
+      };
+
+      if (totalWork === 0) {
+        setImportProgress({ open: false, status: '', progress: 0, totals: null, phase: '', errors: [] });
+        toast.success(`No changes — ${plan.totals.skip} records already up to date`);
+        return;
       }
+
+      setImportProgress(p => ({ ...p, totals, status: `Processing ${totalWork} records...`, phase: 'Records' }));
+
+      // Phase 2: Entities (chunked)
+      let cursor = { phase: 'entities', entityIdx: 0, kind: 'create', offset: 0 };
+      let idMap = initialIdMap;
+      let progress = 0;
+
+      while (cursor && cursor.phase === 'entities') {
+        const res = await base44.functions.invoke('importExcel', { file_url, phase: 'entities', plan, idMap, cursor });
+        const d = res.data;
+        idMap = d.idMap;
+        totalCreated += d.stats.created;
+        totalUpdated += d.stats.updated;
+        if (d.stats.errors?.length) errors.push(...d.stats.errors);
+        progress += d.processed;
+        setImportProgress(p => ({ ...p, progress, errors, phase: 'Records' }));
+        cursor = d.nextCursor;
+      }
+
+      // Phase 3: Links (chunked)
+      while (cursor && cursor.phase === 'links') {
+        setImportProgress(p => ({ ...p, phase: 'Linking', status: 'Applying linkages...' }));
+        const res = await base44.functions.invoke('importExcel', { file_url, phase: 'links', idMap, cursor });
+        const d = res.data;
+        totalLinks += d.stats.links;
+        if (d.stats.errors?.length) errors.push(...d.stats.errors);
+        progress += d.processed;
+        setImportProgress(p => ({ ...p, progress, errors }));
+        cursor = d.done ? null : d.nextCursor;
+      }
+
+      setImportProgress(p => ({ ...p, open: false }));
+      toast.success(`Import complete: ${totalCreated} created, ${totalUpdated} updated, ${totalLinks} links, ${plan.totals.skip} unchanged`);
+      if (errors.length) console.warn('Import errors:', errors);
     } catch (err) {
-      toast.error('Import failed');
+      console.error(err);
+      setImportProgress(p => ({ ...p, open: false }));
+      toast.error('Import failed: ' + (err.message || 'unknown error'));
     } finally {
       setImportLoading(false);
     }
@@ -127,6 +179,14 @@ export default function Dashboard() {
 
   return (
     <div>
+      <ImportProgressDialog
+        open={importProgress.open}
+        status={importProgress.status}
+        progress={importProgress.progress}
+        totals={importProgress.totals}
+        currentPhase={importProgress.phase}
+        errors={importProgress.errors}
+      />
       <PageHeader
         title="Compliance Dashboard"
         description="Monitor your SOC 2, ASAE 3150, and ISO 27001 compliance journey"
