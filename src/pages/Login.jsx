@@ -26,7 +26,7 @@ const Login = () => {
       <nav className="h-24 flex items-center px-8 z-20">
         <div className="flex items-center space-x-2 cursor-pointer">
           <span className="text-white text-2xl font-bold tracking-tight">
-            servicewhy
+            quikgrc
           </span>
           <div className="w-2.5 h-2.5 rounded-full bg-[#9333ea] mb-2" />
         </div>
@@ -64,7 +64,7 @@ const Login = () => {
 
       {/* Footer */}
       <footer className="pb-8 pt-4 text-center z-10 text-white/40 text-sm">
-        &copy; {new Date().getFullYear()} ServiceWhy. All rights reserved.
+        &copy; {new Date().getFullYear()} QuikGRC. All rights reserved.
       </footer>
     </div>
   );

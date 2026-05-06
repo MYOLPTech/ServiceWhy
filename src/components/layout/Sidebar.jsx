@@ -40,7 +40,7 @@ export default function Sidebar() {
         </div>
         {!collapsed && (
           <div className="overflow-hidden">
-            <h1 className="font-bold text-sm tracking-tight">ServiceWhy</h1>
+            <h1 className="font-bold text-sm tracking-tight">QuikGRC</h1>
             <p className="text-[10px] text-sidebar-foreground/50 uppercase tracking-widest">GRC Platform</p>
           </div>
         )}

@@ -1,6 +1,6 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
-  "name": "servicewhy",
+  "name": "quikgrc",
   "compatibility_date": "2026-05-06",
   "observability": {
     "enabled": true
@@ -8,6 +8,16 @@
   "assets": {
     "not_found_handling": "single-page-application"
   },
+  "routes": [
+    {
+      "pattern": "quikgrc.com",
+      "custom_domain": true
+    },
+    {
+      "pattern": "www.quikgrc.com",
+      "custom_domain": true
+    }
+  ],
   "compatibility_flags": [
     "nodejs_compat"
   ]
