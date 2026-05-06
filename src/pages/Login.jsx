@@ -41,7 +41,7 @@ const Login = () => {
         )}
 
         <h1 className="font-outfit font-bold text-4xl md:text-5xl lg:text-7xl leading-tight max-w-5xl tracking-tight mb-16">
-          I built my own GRC Platform in 2 days and <span className="text-[#81d24f]">$200 bucks of Claude!</span>
+          I built my own GRC Platform<br />in 2 days and <br /><span className="text-[#81d24f]">$200 bucks of Claude!</span>
         </h1>
 
         <div className="p-8 bg-white/5 backdrop-blur-md rounded-3xl border border-white/10 shadow-2xl">
