@@ -5,7 +5,7 @@ import {
   FileText, CheckSquare, ClipboardCheck, Settings, LogOut, ChevronLeft, ChevronRight, BookMarked, Database, Building, BarChart3
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { base44 } from '@/api/base44Client';
+import { useAuth } from '@/lib/AuthContext';
 import { useState } from 'react';
 
 const navItems = [
@@ -26,6 +26,7 @@ const navItems = [
 export default function Sidebar() {
   const location = useLocation();
   const [collapsed, setCollapsed] = useState(false);
+  const { logout } = useAuth();
 
   return (
     <aside className={cn(
@@ -39,7 +40,7 @@ export default function Sidebar() {
         </div>
         {!collapsed && (
           <div className="overflow-hidden">
-            <h1 className="font-bold text-sm tracking-tight">ComplianceHub</h1>
+            <h1 className="font-bold text-sm tracking-tight">ServiceWhy</h1>
             <p className="text-[10px] text-sidebar-foreground/50 uppercase tracking-widest">GRC Platform</p>
           </div>
         )}
@@ -77,7 +78,7 @@ export default function Sidebar() {
           {!collapsed && <span>Collapse</span>}
         </button>
         <button
-          onClick={() => base44.auth.logout()}
+          onClick={() => logout()}
           className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-sidebar-foreground/60 hover:text-sidebar-foreground hover:bg-sidebar-accent w-full transition-all"
         >
           <LogOut className="w-4 h-4" />

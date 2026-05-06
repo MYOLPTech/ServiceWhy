@@ -23,23 +23,28 @@ export default function Dashboard() {
   const { data: controls = [] } = useQuery({
     queryKey: ['controls'],
     queryFn: () => base44.entities.Control.list(),
+    retry: false,
   });
   const { data: tasks = [] } = useQuery({
     queryKey: ['tasks'],
     queryFn: () => base44.entities.Task.list(),
+    retry: false,
   });
   const { data: risks = [] } = useQuery({
     queryKey: ['risks'],
     queryFn: () => base44.entities.Risk.list(),
+    retry: false,
   });
   const { data: allPolicies = [] } = useQuery({
     queryKey: ['policies'],
     queryFn: () => base44.entities.Policy.list(),
+    retry: false,
   });
   const policies = allPolicies.filter(p => !p.is_deleted);
   const { data: evidence = [] } = useQuery({
     queryKey: ['evidence'],
     queryFn: () => base44.entities.Evidence.list(),
+    retry: false,
   });
 
   const handleExportExcel = async () => {
