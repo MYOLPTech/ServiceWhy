@@ -34,20 +34,14 @@ const Login = () => {
           </CardDescription>
         </CardHeader>
         <CardContent className="flex flex-col items-center justify-center pb-10 space-y-4">
-          {import.meta.env.VITE_GOOGLE_CLIENT_ID ? (
-            <GoogleLogin
-              onSuccess={handleSuccess}
-              onError={handleError}
-              useOneTap
-              theme="outline"
-              size="large"
-              shape="pill"
-            />
-          ) : (
-            <div className="p-4 bg-red-50 text-red-600 rounded-lg text-sm text-center border border-red-100">
-              <b>Setup Required:</b> Please set <code>VITE_GOOGLE_CLIENT_ID</code> in your environment variables.
-            </div>
-          )}
+          <GoogleLogin
+            onSuccess={handleSuccess}
+            onError={handleError}
+            useOneTap
+            theme="outline"
+            size="large"
+            shape="pill"
+          />
         </CardContent>
       </Card>
       

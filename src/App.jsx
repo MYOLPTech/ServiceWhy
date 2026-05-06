@@ -63,7 +63,7 @@ const AuthenticatedApp = () => {
 function App() {
 
   return (
-    <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID || ""}>
+    <GoogleOAuthProvider clientId="223421761797-v2f9j0sqgpu8867rubs5jsi909ul3a9v.apps.googleusercontent.com">
       <AuthProvider>
         <QueryClientProvider client={queryClientInstance}>
           <Router>
