@@ -47,14 +47,19 @@ const Login = () => {
         <div className="p-8 bg-white/5 backdrop-blur-md rounded-3xl border border-white/10 shadow-2xl">
           <p className="text-gray-300 mb-6 text-lg">Sign in to access your platform</p>
           <div className="flex justify-center">
-            <GoogleLogin
-              onSuccess={handleSuccess}
-              onError={handleError}
-              useOneTap
-              theme="filled_black"
-              size="large"
-              shape="pill"
-            />
+            <div className="relative inline-block group">
+              <button className="bg-[#81d24f] text-[#011E26] px-10 py-3.5 rounded-full font-bold text-lg hover:bg-[#72c244] transition-colors shadow-[0_0_20px_rgba(129,210,79,0.3)] group-hover:shadow-[0_0_30px_rgba(129,210,79,0.5)]">
+                Sign In
+              </button>
+              <div className="absolute inset-0 opacity-0 overflow-hidden w-full h-full cursor-pointer z-10 flex items-center justify-center">
+                <GoogleLogin
+                  onSuccess={handleSuccess}
+                  onError={handleError}
+                  useOneTap
+                  size="large"
+                />
+              </div>
+            </div>
           </div>
         </div>
       </main>
