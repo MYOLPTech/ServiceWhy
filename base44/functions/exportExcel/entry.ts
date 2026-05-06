@@ -90,13 +90,18 @@ Deno.serve(async (req) => {
     const linkSheet = XLSX.utils.json_to_sheet(linkages.length ? linkages : [{ from_entity: '', from_id: '', to_entity: '', to_id: '' }]);
     XLSX.utils.book_append_sheet(wb, linkSheet, 'Linkages');
 
-    const buf = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
-    return new Response(buf, {
-      status: 200,
-      headers: {
-        'Content-Type': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-        'Content-Disposition': `attachment; filename=compliance-export-${new Date().toISOString().split('T')[0]}.xlsx`,
-      },
+    const buf = XLSX.write(wb, { bookType: 'xlsx', type: 'buffer' });
+    // Chunked base64 encoding to avoid call stack overflow on large buffers
+    const bytes = new Uint8Array(buf);
+    const CHUNK = 0x8000;
+    let binary = '';
+    for (let i = 0; i < bytes.length; i += CHUNK) {
+      binary += String.fromCharCode.apply(null, bytes.subarray(i, i + CHUNK));
+    }
+    const b64 = btoa(binary);
+    return Response.json({
+      filename: `compliance-export-${new Date().toISOString().split('T')[0]}.xlsx`,
+      base64: b64,
     });
   } catch (error) {
     console.error('Export error:', error);

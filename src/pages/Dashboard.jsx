@@ -43,20 +43,24 @@ export default function Dashboard() {
   const handleExportExcel = async () => {
     setExportLoading(true);
     try {
-      const response = await base44.functions.invoke('exportExcel', {}, { responseType: 'blob' });
-      const blob = response.data instanceof Blob ? response.data : new Blob([response.data], {
+      const response = await base44.functions.invoke('exportExcel', {});
+      const { base64, filename } = response.data || {};
+      if (!base64) throw new Error('No data');
+      const bytes = Uint8Array.from(atob(base64), c => c.charCodeAt(0));
+      const blob = new Blob([bytes], {
         type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
       });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `compliance-export-${new Date().toISOString().split('T')[0]}.xlsx`;
+      a.download = filename || `compliance-export-${new Date().toISOString().split('T')[0]}.xlsx`;
       document.body.appendChild(a);
       a.click();
       a.remove();
       URL.revokeObjectURL(url);
       toast.success('Excel export downloaded');
     } catch (e) {
+      console.error(e);
       toast.error('Export failed');
     } finally {
       setExportLoading(false);
