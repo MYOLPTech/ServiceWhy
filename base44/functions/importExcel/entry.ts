@@ -2,16 +2,37 @@ import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
 import * as XLSX from 'npm:xlsx@0.18.5';
 
 const ENTITIES = [
-  { name: 'Control', idField: 'control_id' },
-  { name: 'Risk', idField: 'risk_id' },
-  { name: 'Policy', idField: 'policy_id' },
-  { name: 'Task', idField: 'task_id' },
-  { name: 'Evidence', idField: 'evidence_id' },
-  { name: 'CmdbItem', idField: 'asset_id' },
-  { name: 'Vendor', idField: 'vendor_id' },
-  { name: 'Obligation', idField: 'obligation_id' },
-  { name: 'Incident', idField: 'incident_id' },
+  { name: 'Control', idField: 'control_id', prefix: 'CTL' },
+  { name: 'Risk', idField: 'risk_id', prefix: 'RSK' },
+  { name: 'Policy', idField: 'policy_id', prefix: 'POL' },
+  { name: 'Task', idField: 'task_id', prefix: 'TSK' },
+  { name: 'Evidence', idField: 'evidence_id', prefix: 'EVD' },
+  { name: 'CmdbItem', idField: 'asset_id', prefix: 'ASSET' },
+  { name: 'Vendor', idField: 'vendor_id', prefix: 'VND' },
+  { name: 'Obligation', idField: 'obligation_id', prefix: 'OBL' },
+  { name: 'Incident', idField: 'incident_id', prefix: 'INC' },
 ];
+
+// Find the highest numeric suffix used across existing records for a given prefix
+function getMaxIdNumber(records, idField, prefix) {
+  let max = 0;
+  const re = new RegExp(`^${prefix}-(\\d+)$`, 'i');
+  for (const r of records) {
+    const v = r[idField];
+    if (typeof v === 'string') {
+      const m = v.match(re);
+      if (m) {
+        const n = parseInt(m[1], 10);
+        if (n > max) max = n;
+      }
+    }
+  }
+  return max;
+}
+
+function formatId(prefix, n) {
+  return `${prefix}-${String(n).padStart(3, '0')}`;
+}
 
 const ENTITY_TO_LINK_FIELD = {
   Control: 'linked_control_ids',
@@ -75,7 +96,7 @@ Deno.serve(async (req) => {
 
       for (const ent of ENTITIES) {
         builtIdMap[ent.name] = {};
-        builtPlan.entities[ent.name] = { create: [], update: [], skip: 0 };
+        builtPlan.entities[ent.name] = { create: [], update: [], skip: 0, nextIdNumber: 1 };
 
         if (!wb.SheetNames.includes(ent.name)) continue;
         const sheet = wb.Sheets[ent.name];
@@ -87,6 +108,9 @@ Deno.serve(async (req) => {
           if (r[ent.idField]) byBizId[r[ent.idField]] = r;
           builtIdMap[ent.name][r[ent.idField] || r.id] = r.id;
         }
+
+        // Determine next progressive id number for this entity
+        let nextNum = getMaxIdNumber(existing, ent.idField, ent.prefix) + 1;
 
         rows.forEach((row, idx) => {
           const data = unflattenRow(row);
@@ -103,9 +127,14 @@ Deno.serve(async (req) => {
               builtPlan.entities[ent.name].skip++;
             }
           } else {
-            builtPlan.entities[ent.name].create.push({ rowIndex: idx, bizId, data });
+            // Auto-assign a fresh, progressive business ID — overrides any incoming id
+            const newBizId = formatId(ent.prefix, nextNum++);
+            const originalBizId = bizId; // keep so links from the spreadsheet still resolve
+            const newData = { ...data, [ent.idField]: newBizId };
+            builtPlan.entities[ent.name].create.push({ rowIndex: idx, bizId: newBizId, originalBizId, data: newData });
           }
         });
+        builtPlan.entities[ent.name].nextIdNumber = nextNum;
 
         builtPlan.totals.create += builtPlan.entities[ent.name].create.length;
         builtPlan.totals.update += builtPlan.entities[ent.name].update.length;
@@ -152,6 +181,8 @@ Deno.serve(async (req) => {
           if (kind === 'create') {
             const created = await base44.asServiceRole.entities[ent.name].create(item.data);
             if (item.bizId) newIdMap[ent.name][item.bizId] = created.id;
+            // Also map the original spreadsheet id so linkages referencing it still resolve
+            if (item.originalBizId) newIdMap[ent.name][item.originalBizId] = created.id;
             if (created[ent.idField]) newIdMap[ent.name][created[ent.idField]] = created.id;
             stats.created++;
           } else {
