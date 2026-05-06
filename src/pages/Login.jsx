@@ -43,7 +43,7 @@ const Login = () => {
 
 
         <div className="p-8 bg-white/5 backdrop-blur-md rounded-3xl border border-white/10 shadow-2xl">
-          <p className="text-gray-300 mb-6 text-lg">Sign in to access your platform</p>
+          <p className="text-gray-300 mb-6 text-lg">Platform Login</p>
           <div className="flex justify-center">
             <div className="relative inline-block group">
               <button className="bg-[#9333ea] text-white px-10 py-3.5 rounded-full font-bold text-lg hover:bg-[#7e22ce] transition-colors shadow-[0_0_20px_rgba(147,51,234,0.3)] group-hover:shadow-[0_0_30px_rgba(147,51,234,0.5)]">
