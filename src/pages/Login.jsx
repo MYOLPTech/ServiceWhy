@@ -40,9 +40,7 @@ const Login = () => {
           </div>
         )}
 
-        <h1 className="font-outfit font-bold text-4xl md:text-5xl lg:text-7xl leading-tight max-w-5xl tracking-tight mb-16">
-          Platform<br />in 2 days and <br /><span className="text-[#81d24f]">$200 bucks of Claude!</span>
-        </h1>
+
 
         <div className="p-8 bg-white/5 backdrop-blur-md rounded-3xl border border-white/10 shadow-2xl">
           <p className="text-gray-300 mb-6 text-lg">Sign in to access your platform</p>
