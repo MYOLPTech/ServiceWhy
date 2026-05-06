@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
-import { Shield, FileCheck, AlertTriangle, CheckSquare, FileText, ArrowRight, Database } from 'lucide-react';
+import { Shield, FileCheck, AlertTriangle, CheckSquare, FileText, ArrowRight, Database, Download, Upload } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
@@ -14,6 +14,9 @@ import { format } from 'date-fns';
 
 export default function Dashboard() {
   const [datapumpLoading, setDatapumpLoading] = useState(false);
+  const [exportLoading, setExportLoading] = useState(false);
+  const [importLoading, setImportLoading] = useState(false);
+  const fileInputRef = useRef(null);
 
   const { data: controls = [] } = useQuery({
     queryKey: ['controls'],
@@ -36,6 +39,53 @@ export default function Dashboard() {
     queryKey: ['evidence'],
     queryFn: () => base44.entities.Evidence.list(),
   });
+
+  const handleExportExcel = async () => {
+    setExportLoading(true);
+    try {
+      const response = await base44.functions.invoke('exportExcel', {}, { responseType: 'blob' });
+      const blob = response.data instanceof Blob ? response.data : new Blob([response.data], {
+        type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+      });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `compliance-export-${new Date().toISOString().split('T')[0]}.xlsx`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+      toast.success('Excel export downloaded');
+    } catch (e) {
+      toast.error('Export failed');
+    } finally {
+      setExportLoading(false);
+    }
+  };
+
+  const handleImportExcel = async (e) => {
+    const file = e.target.files?.[0];
+    e.target.value = '';
+    if (!file) return;
+    setImportLoading(true);
+    try {
+      const { file_url } = await base44.integrations.Core.UploadFile({ file });
+      const response = await base44.functions.invoke('importExcel', { file_url });
+      const stats = response.data?.stats;
+      if (stats) {
+        const totalCreated = Object.values(stats.created).reduce((a, b) => a + b, 0);
+        const totalUpdated = Object.values(stats.updated).reduce((a, b) => a + b, 0);
+        toast.success(`Import complete: ${totalCreated} created, ${totalUpdated} updated, ${stats.links} links`);
+        if (stats.errors?.length) console.warn('Import errors:', stats.errors);
+      } else {
+        toast.success('Import complete');
+      }
+    } catch (err) {
+      toast.error('Import failed');
+    } finally {
+      setImportLoading(false);
+    }
+  };
 
   const handleDatapump = async () => {
     setDatapumpLoading(true);
@@ -77,10 +127,27 @@ export default function Dashboard() {
         title="Compliance Dashboard"
         description="Monitor your SOC 2, ASAE 3150, and ISO 27001 compliance journey"
         actions={
-          <Button onClick={handleDatapump} disabled={datapumpLoading} className="gap-2">
-            <Database className="w-4 h-4" />
-            {datapumpLoading ? 'Generating...' : 'DATAPUMP'}
-          </Button>
+          <div className="flex items-center gap-2">
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept=".xlsx,.xls"
+              className="hidden"
+              onChange={handleImportExcel}
+            />
+            <Button variant="outline" onClick={handleExportExcel} disabled={exportLoading} className="gap-2">
+              <Download className="w-4 h-4" />
+              {exportLoading ? 'Exporting...' : 'DUMPEXCEL'}
+            </Button>
+            <Button variant="outline" onClick={() => fileInputRef.current?.click()} disabled={importLoading} className="gap-2">
+              <Upload className="w-4 h-4" />
+              {importLoading ? 'Importing...' : 'IMPORTEXCEL'}
+            </Button>
+            <Button onClick={handleDatapump} disabled={datapumpLoading} className="gap-2">
+              <Database className="w-4 h-4" />
+              {datapumpLoading ? 'Generating...' : 'DATAPUMP'}
+            </Button>
+          </div>
         }
       />
 
